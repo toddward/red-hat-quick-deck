@@ -131,6 +131,16 @@ All three are available on Google Fonts:
 - **Text**: white or red-50
 - **Graphics**: tints/shades of red, purple, teal, orange, yellow, black, white
 
+## Iconography
+
+Red Hat publishes an official icon library: **@rhds/icons** (https://github.com/RedHat-UX/red-hat-icons).
+
+- **1,135 SVGs** across 4 sets: `standard` (538 pictograms), `ui` (542 interface icons), `microns` (19 tiny), `social` (36 platform logos)
+- **Browse all icons**: https://red-hat-icons.netlify.app/
+- **CDN source**: Available via jsDelivr at `https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/{set}/{icon}.svg`
+- Icons are monochrome SVGs designed to be recolored via CSS `filter` properties
+- Use the `standard` set for presentation pictograms; `ui` set for interface-style icons
+
 ## Key Brand Principles
 1. **Use red with intention** — pops of red-50 to highlight, never flood
 2. **Keep it simple** — generous white space, restrained color

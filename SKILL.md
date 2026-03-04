@@ -57,6 +57,8 @@ collection is **"Core Dark"** which matches the reference screenshot aesthetic:
 --accent-dark: #a60000;        /* red-60 */
 --accent-light: #f56e6e;       /* red-40 */
 --tag-border: #383838;         /* gray-70 */
+--icon-filter: brightness(0) invert(1);  /* white icons on dark bg */
+--icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%); /* red-50 icons */
 ```
 
 Other available collections (use when the user requests a different feel):
@@ -73,6 +75,8 @@ Other available collections (use when the user requests a different feel):
 --accent-dark: #a60000;
 --accent-light: #f56e6e;
 --tag-border: #c7c7c7;
+--icon-filter: none;                     /* dark icons on light bg (SVGs are dark by default) */
+--icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%); /* red-50 icons */
 ```
 
 When using Core Light:
@@ -99,6 +103,8 @@ When using Core Light:
 --highlight-teal: #37a3a3;     /* teal-50 */
 --highlight-purple: #876fd4;   /* purple-40 */
 --tag-border: #3d2785;         /* purple-60 */
+--icon-filter: brightness(0) invert(1);  /* white icons on dark bg */
+--icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%); /* red-50 icons */
 ```
 
 ### Typography
@@ -203,6 +209,94 @@ above or beside the attribution, at `.rh-logo.large` size.
 Instead, include a minimal red accent bar or the Red Hat red (#ee0000) in the progress indicator
 to maintain brand presence throughout.
 
+### Red Hat Icons
+
+Red Hat publishes an official icon library (`@rhds/icons`) with 1,135 SVGs across 4 sets. Use `<img>` tags
+pointing to the jsDelivr CDN to add icons to slides. Icons are controlled via CSS `filter` variables
+so they adapt to each color mode automatically.
+
+**CDN URL pattern:**
+```
+https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/{set}/{icon}.svg
+```
+
+**Icon sets:**
+| Set | Count | Purpose |
+|-----|-------|---------|
+| `standard` | 538 | Pictograms for presentations, marketing, and conceptual illustration |
+| `ui` | 542 | Interface icons for menus, actions, and controls |
+| `microns` | 19 | Tiny utility icons (chevrons, close, etc.) |
+| `social` | 36 | Platform logos (GitHub, LinkedIn, YouTube, etc.) |
+
+Browse all icons: https://red-hat-icons.netlify.app/
+
+#### Curated Icon Reference
+
+These are the most useful icons for presentations, organized by topic. Use the `standard` set unless noted otherwise.
+
+**Cloud & Infrastructure**
+`cloud`, `cloud-upload`, `server`, `container`, `kubernetes-pod`, `microservices`, `virtual-machine`, `data-center`, `network`, `hybrid-cloud`, `private-cloud`, `public-cloud`
+
+**Security**
+`padlock-locked`, `padlock-unlocked`, `shield`, `firewall-a`, `key`, `fingerprint`, `identity`
+
+**Development & Code**
+`code` (ui), `api`, `git`, `terminal`, `bug`, `build`, `application`, `integration`
+
+**AI & Automation**
+`ai-ml`, `automation`, `robot`, `brain`, `ai-experience`, `machine-learning`
+
+**Business & Strategy**
+`chart-line`, `trophy`, `target`, `handshake`, `calendar`, `checklist`, `growth`, `cost`, `efficiency`
+
+**Data & Storage**
+`database`, `data`, `storage`, `hard-drive`, `archive`
+
+**Networking & Edge**
+`network`, `globe`, `wifi`, `satellite`, `edge`, `5g`, `connected`
+
+**Collaboration & People**
+`user`, `users`, `chat`, `email`, `presentation`, `support`, `community`
+
+#### Icon CSS
+
+```css
+/* === ICON STYLES === */
+.rh-icon {
+  height: 48px;
+  width: 48px;
+  filter: var(--icon-filter);
+  vertical-align: middle;
+}
+.rh-icon.small  { height: 24px; width: 24px; }
+.rh-icon.medium { height: 48px; width: 48px; }
+.rh-icon.large  { height: 64px; width: 64px; }
+.rh-icon.xl     { height: 96px; width: 96px; }
+.rh-icon.accent { filter: var(--icon-filter-accent); }
+```
+
+#### Icon Usage in HTML
+
+```html
+<!-- Basic icon -->
+<img class="rh-icon" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/cloud.svg" alt="Cloud">
+
+<!-- Small accent-colored icon beside a headline -->
+<h2><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/shield.svg" alt=""> Security First</h2>
+
+<!-- Large icon for a stat slide -->
+<img class="rh-icon xl accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/growth.svg" alt="">
+<div class="big-number">3.2x</div>
+```
+
+#### Icon Usage Guidelines
+
+- **Use sparingly**: 2-3 icons per slide maximum. Icons should clarify, not decorate.
+- **Best uses**: Stat slide topic icons, feature list bullets, architecture diagram box labels, comparison column headers.
+- **Don't**: Use icons as the sole content, mix too many sizes on one slide, use icons without supporting text.
+- **Sizing**: Use `.small` (24px) inline with text, `.medium` (48px) for feature lists, `.large`/`.xl` for hero/stat accent.
+- **Color**: Icons inherit the mode's filter by default. Use `.accent` class sparingly for emphasis (same restraint as red-50 text).
+
 ### Tag / Pill Styling
 
 The reference uses outlined pills for categorization (e.g., "Local-First", "Air-Gap Ready"). Style them:
@@ -245,6 +339,7 @@ The reference uses outlined pills for categorization (e.g., "Local-First", "Air-
     /* === COLOR VARIABLES (dark or light, based on user choice) === */
     /* === TYPOGRAPHY === */
     /* === LOGO STYLES === */
+    /* === ICON STYLES === */
     /* === SLIDE CONTAINER === */
     /* === NAVIGATION === */
     /* === SLIDE TYPES === */
@@ -301,21 +396,25 @@ Every deck should include these slide types (adapt as needed):
 #### 2. Content Slide
 - Slide headline as an assertion (not a label)
 - Body content: paragraphs, bullet points (use sparingly), or key-value pairs
+- Optional: a small icon (`.rh-icon.small`) beside the headline for topical accent
+- Optional: icons as feature list markers instead of bullet characters
 - Optional: source attribution at bottom
 
 #### 3. Big Number / Stat Slide
+- Optional: topic icon (`.rh-icon.xl.accent`) centered above the big number
 - One large number (80-120px font size) in red-50 or white
 - Brief context line below in gray-30
 - Source attribution at bottom
 
 #### 4. Comparison / Before-After Slide
 - Two-column layout
+- Optional: icons representing each side as column headers (e.g., `padlock-unlocked` vs `padlock-locked`)
 - Clear visual distinction between old/new or with/without
 - Use red-50 to highlight the preferred side
 
 #### 5. Architecture / Diagram Slide
 - CSS-based box diagrams with flexbox/grid (no images required)
-- Boxes with borders and labels
+- Boxes with borders and labels — use icons (`.rh-icon.small`) inside boxes alongside text labels for visual clarity
 - Arrows represented with CSS or Unicode characters (→, ↓)
 - Red-50 highlight on the key innovation
 
@@ -486,7 +585,9 @@ Before delivering the HTML file, verify:
 - [ ] Contextual notes are present with references, links, and additional context for deeper exploration
 - [ ] Sources are attributed on data slides
 - [ ] At least one AI image opportunity is noted in contextual notes
-- [ ] File is self-contained (no external dependencies besides Google Fonts)
+- [ ] Icons (if used) load from jsDelivr CDN and display correctly in chosen mode
+- [ ] Icons are used sparingly (2-3 per slide max) and enhance rather than clutter
+- [ ] File is self-contained (no external dependencies besides Google Fonts and optionally jsDelivr icons)
 - [ ] Progress indicator shows current/total slides
 - [ ] The narrative follows a clear story arc with emotional rhythm
 - [ ] **Thank You slide** is present as the final slide with author name, role, and Red Hat logo
