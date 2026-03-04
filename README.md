@@ -4,8 +4,9 @@ A Claude Code skill that generates stunning, self-contained HTML slide presentat
 
 ## What It Does
 
-- Generates single-file, self-contained HTML decks (inline CSS, inline JS, Google Fonts via CDN)
-- Applies Red Hat brand colors, typography (Red Hat Display, Text, Mono), and logo
+- Generates single-file, self-contained HTML decks (inline CSS, inline JS)
+- Red Hat brand fonts (Red Hat Display, Text, Mono) are hotlinked directly in the HTML via Google Fonts CDN — no local font installation required
+- Applies Red Hat brand colors, typography, and logo
 - Supports **Dark**, **Light**, and **Expressive Dark** color modes
 - Uses story-arc-driven narrative structures to make technical content compelling
 - Includes keyboard/click/touch navigation, slide counter, and speaker notes (press `N`)
