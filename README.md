@@ -9,8 +9,8 @@ A Claude Code skill that generates stunning, self-contained HTML slide presentat
 - Applies Red Hat brand colors, typography, and logo
 - Supports **Dark**, **Light**, and **Expressive Dark** color modes
 - Uses story-arc-driven narrative structures to make technical content compelling
-- Includes keyboard/click/touch navigation, slide counter, and speaker notes (press `N`)
-- Suggests AI image opportunities in speaker notes for visual enhancement
+- Includes keyboard/click/touch navigation, slide counter, and contextual notes panel (press `N`) with references, links, and deeper context
+- Suggests AI image opportunities in contextual notes for visual enhancement
 
 ## Files
 

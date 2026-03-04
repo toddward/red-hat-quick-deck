@@ -35,7 +35,7 @@ A single `.html` file that:
 - Has a slide counter / progress indicator
 - Looks cinematic and professional on screen, projector, or shared link
 - Follows a deliberate story arc that builds a persuasive narrative
-- Includes speaker notes (toggled with 'N' key) for presenter reference
+- Includes a contextual notes panel (toggled with 'N' key) for additional references, links, and deeper context on each slide
 - Is responsive and works on mobile for async viewing
 
 ## Design System
@@ -248,7 +248,7 @@ The reference uses outlined pills for categorization (e.g., "Local-First", "Air-
     /* === SLIDE CONTAINER === */
     /* === NAVIGATION === */
     /* === SLIDE TYPES === */
-    /* === SPEAKER NOTES === */
+    /* === CONTEXTUAL NOTES PANEL === */
     /* === ANIMATIONS === */
   </style>
 </head>
@@ -275,7 +275,7 @@ The reference uses outlined pills for categorization (e.g., "Local-First", "Air-
     </div>
   </div>
   <div class="controls">
-    <div class="nav-hint">← → or click to navigate · N for notes</div>
+    <div class="nav-hint">← → or click to navigate · N for additional context</div>
     <div class="progress"><span class="current">1</span> / <span class="total">10</span></div>
   </div>
   <script>
@@ -327,7 +327,7 @@ Every deck should include these slide types (adapt as needed):
 #### 7. Call-to-Action / Closing Slide
 - Clear next steps
 - Contact info or resources
-- QR code placeholder if relevant (note in speaker notes)
+- QR code placeholder if relevant (note in contextual notes)
 
 #### 8. Thank You Slide (Required — always the final slide)
 - Large "Thank You" headline in Red Hat Display, Black weight
@@ -365,11 +365,11 @@ For each slide:
 - Write concise supporting content (fewer words = more impact)
 - Choose the appropriate slide type
 - Add source attributions where data is cited
-- Add speaker notes with talking points, transitions, and timing cues
+- Add contextual notes with references, links, deeper explanations, and related resources that let viewers dive deeper into the slide's topic
 
 ### Step 5: AI Image Opportunities
 As you build slides, identify moments where a custom AI-generated image would elevate the deck.
-For each opportunity, add a note in the speaker notes like:
+For each opportunity, add a note in the contextual notes like:
 
 ```
 [IMAGE OPPORTUNITY] Prompt for Nano Banana Pro 2:
@@ -412,7 +412,7 @@ Include this navigation system in every deck:
       s.style.display = j === i ? 'flex' : 'none';
     });
     currentEl.textContent = i + 1;
-    // Update notes if visible
+    // Update contextual notes if visible
     if (notesVisible && notesPanel) {
       const note = slides[i].dataset.notes || '';
       notesPanel.innerHTML = note;
@@ -483,9 +483,9 @@ Before delivering the HTML file, verify:
 - [ ] Headlines tell a complete story when read in sequence
 - [ ] Keyboard navigation works (← → Space N)
 - [ ] Click/tap navigation works
-- [ ] Speaker notes are present with talking points
+- [ ] Contextual notes are present with references, links, and additional context for deeper exploration
 - [ ] Sources are attributed on data slides
-- [ ] At least one AI image opportunity is noted in speaker notes
+- [ ] At least one AI image opportunity is noted in contextual notes
 - [ ] File is self-contained (no external dependencies besides Google Fonts)
 - [ ] Progress indicator shows current/total slides
 - [ ] The narrative follows a clear story arc with emotional rhythm
@@ -514,10 +514,10 @@ This is the target aesthetic. Every title slide should feel this cinematic and i
 Save the generated HTML to `/mnt/user-data/outputs/[deck-name].html` and present it to the user.
 The filename should be kebab-case derived from the deck title.
 
-## Tips for Presenters
+## Tips for Viewers
 
-Include these tips in the first speaker note:
+Include these tips in the first contextual note:
 - Arrow keys or click to navigate
-- Press 'N' to toggle speaker notes
+- Press 'N' to toggle contextual notes — references, links, and additional context for each slide
 - Works in any modern browser — share the HTML file directly
 - For best results, use fullscreen (F11) or present in a browser tab
