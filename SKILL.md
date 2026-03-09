@@ -29,7 +29,7 @@ narrative story arcs to make technical content compelling and memorable.
 ## What This Skill Produces
 
 A single `.html` file that:
-- Is completely self-contained (inline CSS, inline JS, Google Fonts loaded via CDN)
+- Is completely self-contained (inline CSS, inline JS; Google Fonts, Red Hat Design Tokens, and optionally Red Hat Icons loaded via CDN)
 - Can be opened in any browser, emailed, or hosted on any web server
 - Has keyboard navigation (arrow keys, spacebar) and click navigation
 - Has a slide counter / progress indicator
@@ -40,23 +40,54 @@ A single `.html` file that:
 
 ## Design System
 
+### Red Hat Design Tokens
+
+This skill integrates the official **Red Hat Design Tokens** (`@rhds/tokens`) for spacing, typography sizing,
+borders, and shadows. The tokens CSS is loaded via jsDelivr CDN alongside the existing Google Fonts and
+`@rhds/icons` dependencies. All token references include hardcoded fallbacks so decks degrade gracefully offline.
+
+**CDN URL:**
+```
+https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css
+```
+
+**Important color note:** The RHDS v3 tokens use accessibility-adjusted color values (e.g.,
+`--rh-color-brand-red-on-dark` resolves to `#FF442B`, not `#ee0000`). This skill intentionally keeps
+the established Red Hat brand palette hex values (`#ee0000` for red-50, etc.) for visual consistency
+with the classic brand aesthetic. Token names are annotated in comments for cross-reference.
+
+**What we use from `@rhds/tokens`:**
+- **Spacing**: `--rh-space-xs` (4px) through `--rh-space-7xl` (128px) — consistent 4px-base scale
+- **Typography sizing**: `--rh-font-size-heading-*` and `--rh-font-size-body-text-*`
+- **Font families**: `--rh-font-family-heading`, `--rh-font-family-body-text`, `--rh-font-family-code`
+- **Border radius**: `--rh-border-radius-default` (3px), `--rh-border-radius-pill` (64px)
+- **Border width**: `--rh-border-width-sm` (1px), `--rh-border-width-md` (2px), `--rh-border-width-lg` (3px)
+- **Box shadows**: `--rh-box-shadow-sm/md/lg/xl` — for cards, architecture boxes, elevated surfaces
+- **Opacity**: `--rh-opacity-*` — for overlays, muted elements, and glow effects
+
+**Token reference:** https://ux.redhat.com/tokens/ · Package: https://www.npmjs.com/package/@rhds/tokens
+
 ### Color Palette Selection
 
 Choose ONE color collection per deck from the Red Hat brand palette. The **default and recommended**
-collection is **"Core Dark"** which matches the reference screenshot aesthetic:
+collection is **"Core Dark"** which matches the reference screenshot aesthetic.
+
+Each mode sets `color-scheme` on `:root` so that any `light-dark()` token values resolve correctly.
 
 **Core Dark (Default)**
-```
---bg-primary: #000000;        /* black */
---bg-secondary: #1f1f1f;      /* gray-90 */
---bg-surface: #292929;         /* gray-80 */
---text-primary: #ffffff;       /* white */
---text-secondary: #c7c7c7;    /* gray-30 */
+```css
+:root { color-scheme: dark; }
+
+--bg-primary: #000000;        /* black · --rh-color-surface-darkest */
+--bg-secondary: #1f1f1f;      /* gray-90 · --rh-color-surface-darker */
+--bg-surface: #292929;         /* gray-80 · --rh-color-surface-dark */
+--text-primary: #ffffff;       /* white · --rh-color-text-primary-on-dark */
+--text-secondary: #c7c7c7;    /* gray-30 · --rh-color-text-secondary-on-dark */
 --text-muted: #a3a3a3;         /* gray-40 */
 --accent: #ee0000;             /* red-50 — Red Hat Red */
 --accent-dark: #a60000;        /* red-60 */
 --accent-light: #f56e6e;       /* red-40 */
---tag-border: #383838;         /* gray-70 */
+--tag-border: #383838;         /* gray-70 · --rh-color-border-subtle-on-dark */
 --icon-filter: brightness(0) invert(1);  /* white icons on dark bg */
 --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%); /* red-50 icons */
 ```
@@ -64,17 +95,19 @@ collection is **"Core Dark"** which matches the reference screenshot aesthetic:
 Other available collections (use when the user requests a different feel):
 
 **Core Light** (clean, professional — best for print/email/documentation)
-```
---bg-primary: #ffffff;
---bg-secondary: #f2f2f2;
---bg-surface: #e0e0e0;
---text-primary: #151515;
---text-secondary: #4d4d4d;
---text-muted: #707070;
---accent: #ee0000;
---accent-dark: #a60000;
---accent-light: #f56e6e;
---tag-border: #c7c7c7;
+```css
+:root { color-scheme: light; }
+
+--bg-primary: #ffffff;         /* white · --rh-color-surface-lightest */
+--bg-secondary: #f2f2f2;      /* gray-10 · --rh-color-surface-lighter */
+--bg-surface: #e0e0e0;        /* gray-20 · --rh-color-surface-light */
+--text-primary: #151515;      /* gray-95 · --rh-color-text-primary-on-light */
+--text-secondary: #4d4d4d;    /* gray-60 · --rh-color-text-secondary-on-light */
+--text-muted: #707070;        /* gray-50 */
+--accent: #ee0000;             /* red-50 — Red Hat Red */
+--accent-dark: #a60000;        /* red-60 */
+--accent-light: #f56e6e;       /* red-40 */
+--tag-border: #c7c7c7;        /* gray-30 · --rh-color-border-subtle-on-light */
 --icon-filter: none;                     /* dark icons on light bg (SVGs are dark by default) */
 --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%); /* red-50 icons */
 ```
@@ -90,16 +123,18 @@ When using Core Light:
 - The progress indicator `.current` number is still red-50
 
 **Expressive Dark** (for more colorful content — adds teal and purple accents)
-```
+```css
+:root { color-scheme: dark; }
+
 --bg-primary: #1b0d33;         /* purple-80 */
---bg-secondary: #000000;
+--bg-secondary: #000000;       /* black */
 --bg-surface: #21134d;         /* purple-70 */
---text-primary: #ffffff;
+--text-primary: #ffffff;       /* white · --rh-color-text-primary-on-dark */
 --text-secondary: #d0c5f4;     /* purple-20 */
 --text-muted: #b6a6e9;         /* purple-30 */
---accent: #ee0000;
---accent-dark: #a60000;
---accent-light: #f56e6e;
+--accent: #ee0000;             /* red-50 — Red Hat Red */
+--accent-dark: #a60000;        /* red-60 */
+--accent-light: #f56e6e;       /* red-40 */
 --highlight-teal: #37a3a3;     /* teal-50 */
 --highlight-purple: #876fd4;   /* purple-40 */
 --tag-border: #3d2785;         /* purple-60 */
@@ -111,9 +146,34 @@ When using Core Light:
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap');
 
---font-display: 'Red Hat Display', sans-serif;   /* Headlines */
---font-body: 'Red Hat Text', sans-serif;          /* Body text */
---font-mono: 'Red Hat Mono', monospace;           /* Code, tags, technical */
+--font-display: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);   /* Headlines */
+--font-body: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);       /* Body text */
+--font-mono: var(--rh-font-family-code, 'Red Hat Mono', monospace);             /* Code, tags, technical */
+```
+
+#### Typography Sizing (from `@rhds/tokens`)
+
+Use these token-based sizes for consistent typographic scale across decks:
+
+| Token | Size | Usage |
+|-------|------|-------|
+| `--rh-font-size-heading-2xl` | 3rem (48px) | Title slide headline |
+| `--rh-font-size-heading-xl` | 2.5rem (40px) | Section headlines, big impact text |
+| `--rh-font-size-heading-lg` | 2rem (32px) | Slide headlines |
+| `--rh-font-size-heading-md` | 1.5rem (24px) | Sub-headlines |
+| `--rh-font-size-heading-sm` | 1.25rem (20px) | Card titles, labels |
+| `--rh-font-size-body-text-xl` | 1.25rem (20px) | Lead paragraphs, subtitles |
+| `--rh-font-size-body-text-lg` | 1.125rem (18px) | Body text on slides |
+| `--rh-font-size-body-text-md` | 1rem (16px) | Standard body |
+| `--rh-font-size-body-text-sm` | 0.875rem (14px) | Captions, attributions |
+| `--rh-font-size-body-text-xs` | 0.75rem (12px) | Tags, breadcrumbs, fine print |
+
+Example usage:
+```css
+h1 { font-size: var(--rh-font-size-heading-2xl, 3rem); }
+h2 { font-size: var(--rh-font-size-heading-lg, 2rem); }
+.subtitle { font-size: var(--rh-font-size-body-text-xl, 1.25rem); }
+.tag { font-size: var(--rh-font-size-body-text-xs, 0.75rem); }
 ```
 
 ### Visual Effects
@@ -297,18 +357,65 @@ These are the most useful icons for presentations, organized by topic. Use the `
 - **Sizing**: Use `.small` (24px) inline with text, `.medium` (48px) for feature lists, `.large`/`.xl` for hero/stat accent.
 - **Color**: Icons inherit the mode's filter by default. Use `.accent` class sparingly for emphasis (same restraint as red-50 text).
 
+### Spacing Scale (from `@rhds/tokens`)
+
+Use the official Red Hat spacing tokens for all padding, margins, and gaps. This ensures visual
+consistency with the broader Red Hat design system. All values are multiples of 4px.
+
+| Token | Value | Common Usage |
+|-------|-------|-------------|
+| `--rh-space-xs` | 4px | Tight inline gaps, icon-to-text spacing |
+| `--rh-space-sm` | 8px | Compact element spacing |
+| `--rh-space-md` | 16px | Standard element spacing, tag padding horizontal |
+| `--rh-space-lg` | 24px | Section gaps, card padding |
+| `--rh-space-xl` | 32px | Slide content gaps |
+| `--rh-space-2xl` | 48px | Major section spacing |
+| `--rh-space-3xl` | 64px | Slide side padding |
+| `--rh-space-4xl` | 80px | Slide top/bottom padding |
+| `--rh-space-5xl` | 96px | Large hero spacing |
+| `--rh-space-6xl` | 112px | Extra large spacing |
+| `--rh-space-7xl` | 128px | Maximum spacing |
+
+Example usage:
+```css
+.slide { padding: var(--rh-space-4xl, 80px) var(--rh-space-3xl, 64px); }
+.content-body { gap: var(--rh-space-lg, 24px); }
+.breadcrumb svg + span { margin-left: var(--rh-space-sm, 8px); }
+```
+
+### Border & Shadow Tokens (from `@rhds/tokens`)
+
+```css
+/* Border widths */
+--rh-border-width-sm: 1px;    /* Default borders, tag outlines */
+--rh-border-width-md: 2px;    /* Emphasized borders, accent lines */
+--rh-border-width-lg: 3px;    /* Heavy emphasis, decorative rules */
+
+/* Border radii */
+--rh-border-radius-sharp: 0px;       /* No rounding — architecture boxes */
+--rh-border-radius-default: 3px;     /* Subtle rounding — cards, surfaces */
+--rh-border-radius-pill: 64px;       /* Full pill — tags, badges */
+
+/* Box shadows — use for elevated surfaces and architecture diagram depth */
+--rh-box-shadow-sm: 0 2px 4px 0 rgba(21, 21, 21, 0.2);      /* Subtle lift */
+--rh-box-shadow-md: 0 4px 6px 1px rgba(21, 21, 21, 0.25);    /* Cards */
+--rh-box-shadow-lg: 0 6px 8px 2px rgba(21, 21, 21, 0.3);     /* Modals, panels */
+--rh-box-shadow-xl: 0 8px 24px 3px rgba(21, 21, 21, 0.35);   /* Hero elements */
+```
+
 ### Tag / Pill Styling
 
-The reference uses outlined pills for categorization (e.g., "Local-First", "Air-Gap Ready"). Style them:
+The reference uses outlined pills for categorization (e.g., "Local-First", "Air-Gap Ready"). Style them
+using design tokens for sizing, spacing, and borders:
 
 ```css
 .tag {
   display: inline-block;
-  padding: 6px 16px;
-  border: 1px solid var(--tag-border);
-  border-radius: 20px;
+  padding: var(--rh-space-xs, 4px) var(--rh-space-md, 16px);
+  border: var(--rh-border-width-sm, 1px) solid var(--tag-border);
+  border-radius: var(--rh-border-radius-pill, 64px);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -330,14 +437,18 @@ The reference uses outlined pills for categorization (e.g., "Local-First", "Air-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>[Deck Title]</title>
+  <!-- Red Hat Design Tokens (spacing, typography, borders, shadows) -->
+  <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* === RESET & BASE === */
+    :root { color-scheme: dark; } /* Set to 'light' for Core Light mode */
     /* === COLOR VARIABLES (dark or light, based on user choice) === */
-    /* === TYPOGRAPHY === */
+    /* === TYPOGRAPHY (uses --rh-font-family-* and --rh-font-size-* tokens with fallbacks) === */
+    /* === SPACING (uses --rh-space-* tokens with fallbacks) === */
     /* === LOGO STYLES === */
     /* === ICON STYLES === */
     /* === SLIDE CONTAINER === */
@@ -587,7 +698,12 @@ Before delivering the HTML file, verify:
 - [ ] At least one AI image opportunity is noted in contextual notes
 - [ ] Icons (if used) load from jsDelivr CDN and display correctly in chosen mode
 - [ ] Icons are used sparingly (2-3 per slide max) and enhance rather than clutter
-- [ ] File is self-contained (no external dependencies besides Google Fonts and optionally jsDelivr icons)
+- [ ] Red Hat Design Tokens CSS is loaded via jsDelivr CDN (`@rhds/tokens@3.0.2/css/global.min.css`)
+- [ ] `color-scheme` is set correctly on `:root` (`dark` for Core Dark / Expressive Dark, `light` for Core Light)
+- [ ] Spacing uses `--rh-space-*` tokens with px fallbacks (e.g., `var(--rh-space-lg, 24px)`)
+- [ ] Typography sizing uses `--rh-font-size-*` tokens with fallbacks where appropriate
+- [ ] Tags use `--rh-border-radius-pill` and `--rh-space-*` for padding
+- [ ] File is self-contained (no external dependencies besides Google Fonts, jsDelivr icons, and jsDelivr design tokens)
 - [ ] Progress indicator shows current/total slides
 - [ ] The narrative follows a clear story arc with emotional rhythm
 - [ ] **Thank You slide** is present as the final slide with author name, role, and Red Hat logo

@@ -20,7 +20,7 @@ Generate a deck whenever the user asks for a slide deck, presentation, quick dec
 ## What You Produce
 
 A single `.html` file that:
-- Is completely self-contained (inline CSS, inline JS, Google Fonts loaded via CDN)
+- Is completely self-contained (inline CSS, inline JS; Google Fonts, Red Hat Design Tokens, and optionally Red Hat Icons loaded via CDN)
 - Can be opened in any browser, emailed, or hosted on any web server
 - Has keyboard navigation (arrow keys, spacebar) and click navigation
 - Has a slide counter / progress indicator
@@ -76,9 +76,11 @@ All fonts are loaded via Google Fonts CDN:
 https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap
 ```
 
-- **Red Hat Display** — Headlines, titles, large text (Bold or Black weight)
-- **Red Hat Text** — Body copy, paragraphs (Regular weight)
-- **Red Hat Mono** — Code, technical content, tags, monospace
+- **Red Hat Display** (`--rh-font-family-heading`) — Headlines, titles, large text (Bold or Black weight)
+- **Red Hat Text** (`--rh-font-family-body-text`) — Body copy, paragraphs (Regular weight)
+- **Red Hat Mono** (`--rh-font-family-code`) — Code, technical content, tags, monospace
+
+**Font sizing tokens:** `--rh-font-size-heading-2xl` (3rem) through `--rh-font-size-heading-sm` (1.25rem) for headings; `--rh-font-size-body-text-xl` (1.25rem) through `--rh-font-size-body-text-xs` (0.75rem) for body text. Always include px/rem fallbacks.
 
 **Typography Rules:**
 - Color for text: black or white for body; red-50 for accent headlines/pull quotes only
@@ -98,38 +100,59 @@ https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&fa
 
 ## Design System
 
+### Red Hat Design Tokens
+
+This system integrates the official **@rhds/tokens** package for spacing, typography sizing, borders, and shadows.
+The tokens CSS is loaded via jsDelivr CDN. All token references include hardcoded fallbacks for offline use.
+
+**CDN URL:** `https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css`
+
+**What we use from tokens:**
+- Spacing: `--rh-space-xs` (4px) through `--rh-space-7xl` (128px)
+- Typography: `--rh-font-size-heading-*`, `--rh-font-size-body-text-*`, `--rh-font-family-*`
+- Borders: `--rh-border-radius-pill` (64px), `--rh-border-radius-default` (3px), `--rh-border-width-sm/md/lg`
+- Shadows: `--rh-box-shadow-sm/md/lg/xl`
+- Opacity: `--rh-opacity-*`
+
+**Note:** Token colors are RHDS v3 accessibility-adjusted values that differ from the classic brand palette.
+We keep the established hex values for visual consistency while using tokens for non-color properties.
+
 ### Color Palette Selection
 
-Choose ONE color collection per deck:
+Choose ONE color collection per deck. Each mode sets `color-scheme` on `:root` for proper token resolution.
 
 **Core Dark (Default)**
-```
---bg-primary: #000000;
---bg-secondary: #1f1f1f;
---bg-surface: #292929;
---text-primary: #ffffff;
---text-secondary: #c7c7c7;
---text-muted: #a3a3a3;
---accent: #ee0000;
---accent-dark: #a60000;
---accent-light: #f56e6e;
---tag-border: #383838;
+```css
+:root { color-scheme: dark; }
+
+--bg-primary: #000000;        /* black · --rh-color-surface-darkest */
+--bg-secondary: #1f1f1f;      /* gray-90 · --rh-color-surface-darker */
+--bg-surface: #292929;         /* gray-80 · --rh-color-surface-dark */
+--text-primary: #ffffff;       /* white · --rh-color-text-primary-on-dark */
+--text-secondary: #c7c7c7;    /* gray-30 · --rh-color-text-secondary-on-dark */
+--text-muted: #a3a3a3;         /* gray-40 */
+--accent: #ee0000;             /* red-50 — Red Hat Red */
+--accent-dark: #a60000;        /* red-60 */
+--accent-light: #f56e6e;       /* red-40 */
+--tag-border: #383838;         /* gray-70 · --rh-color-border-subtle-on-dark */
 --icon-filter: brightness(0) invert(1);
 --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
 ```
 
 **Core Light** (clean, professional — best for print/email)
-```
---bg-primary: #ffffff;
---bg-secondary: #f2f2f2;
---bg-surface: #e0e0e0;
---text-primary: #151515;
---text-secondary: #4d4d4d;
---text-muted: #707070;
---accent: #ee0000;
---accent-dark: #a60000;
---accent-light: #f56e6e;
---tag-border: #c7c7c7;
+```css
+:root { color-scheme: light; }
+
+--bg-primary: #ffffff;         /* white · --rh-color-surface-lightest */
+--bg-secondary: #f2f2f2;      /* gray-10 · --rh-color-surface-lighter */
+--bg-surface: #e0e0e0;        /* gray-20 · --rh-color-surface-light */
+--text-primary: #151515;      /* gray-95 · --rh-color-text-primary-on-light */
+--text-secondary: #4d4d4d;    /* gray-60 · --rh-color-text-secondary-on-light */
+--text-muted: #707070;        /* gray-50 */
+--accent: #ee0000;             /* red-50 — Red Hat Red */
+--accent-dark: #a60000;        /* red-60 */
+--accent-light: #f56e6e;       /* red-40 */
+--tag-border: #c7c7c7;        /* gray-30 · --rh-color-border-subtle-on-light */
 --icon-filter: none;
 --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
 ```
@@ -141,19 +164,21 @@ Core Light specifics:
 - Architecture diagram boxes use `background: rgba(242,242,242,0.8)` and `border: 1px solid #c7c7c7`
 
 **Expressive Dark** (more colorful — adds teal and purple accents)
-```
---bg-primary: #1b0d33;
---bg-secondary: #000000;
---bg-surface: #21134d;
---text-primary: #ffffff;
---text-secondary: #d0c5f4;
---text-muted: #b6a6e9;
---accent: #ee0000;
---accent-dark: #a60000;
---accent-light: #f56e6e;
---highlight-teal: #37a3a3;
---highlight-purple: #876fd4;
---tag-border: #3d2785;
+```css
+:root { color-scheme: dark; }
+
+--bg-primary: #1b0d33;         /* purple-80 */
+--bg-secondary: #000000;       /* black */
+--bg-surface: #21134d;         /* purple-70 */
+--text-primary: #ffffff;       /* white · --rh-color-text-primary-on-dark */
+--text-secondary: #d0c5f4;     /* purple-20 */
+--text-muted: #b6a6e9;         /* purple-30 */
+--accent: #ee0000;             /* red-50 — Red Hat Red */
+--accent-dark: #a60000;        /* red-60 */
+--accent-light: #f56e6e;       /* red-40 */
+--highlight-teal: #37a3a3;     /* teal-50 */
+--highlight-purple: #876fd4;   /* purple-40 */
+--tag-border: #3d2785;         /* purple-60 */
 --icon-filter: brightness(0) invert(1);
 --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
 ```
@@ -214,16 +239,27 @@ Embed the logo as inline SVG. Two versions:
 - **Closing/CTA slide**: Large logo centered or left-aligned near bottom
 - **Content slides**: No logo — maintain brand presence via red accents and progress indicator
 
+### Spacing (from `@rhds/tokens`)
+
+Use the official spacing tokens for padding, margins, and gaps (4px base scale):
+`--rh-space-xs` (4px), `--rh-space-sm` (8px), `--rh-space-md` (16px), `--rh-space-lg` (24px), `--rh-space-xl` (32px), `--rh-space-2xl` (48px), `--rh-space-3xl` (64px), `--rh-space-4xl` (80px), `--rh-space-5xl` (96px), `--rh-space-6xl` (112px), `--rh-space-7xl` (128px). Always include px fallbacks.
+
+### Borders & Shadows (from `@rhds/tokens`)
+
+- Border widths: `--rh-border-width-sm` (1px), `--rh-border-width-md` (2px), `--rh-border-width-lg` (3px)
+- Border radii: `--rh-border-radius-sharp` (0px), `--rh-border-radius-default` (3px), `--rh-border-radius-pill` (64px)
+- Box shadows: `--rh-box-shadow-sm`, `--rh-box-shadow-md`, `--rh-box-shadow-lg`, `--rh-box-shadow-xl`
+
 ### Tag / Pill Styling
 
 ```css
 .tag {
   display: inline-block;
-  padding: 6px 16px;
-  border: 1px solid var(--tag-border);
-  border-radius: 20px;
+  padding: var(--rh-space-xs, 4px) var(--rh-space-md, 16px);
+  border: var(--rh-border-width-sm, 1px) solid var(--tag-border);
+  border-radius: var(--rh-border-radius-pill, 64px);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-secondary);
@@ -283,13 +319,18 @@ Red Hat publishes an official icon library (`@rhds/icons`) with 1,135 SVGs. Use 
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>[Deck Title]</title>
+  <!-- Red Hat Design Tokens (spacing, typography, borders, shadows) -->
+  <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     /* === RESET & BASE === */
+    :root { color-scheme: dark; } /* Set to 'light' for Core Light mode */
     /* === COLOR VARIABLES === */
-    /* === TYPOGRAPHY === */
+    /* === TYPOGRAPHY (uses --rh-font-family-* and --rh-font-size-* tokens with fallbacks) === */
+    /* === SPACING (uses --rh-space-* tokens with fallbacks) === */
     /* === LOGO STYLES === */
     /* === ICON STYLES === */
     /* === SLIDE CONTAINER === */
@@ -490,7 +531,12 @@ Before delivering, verify:
 - [ ] Sources attributed on data slides
 - [ ] Icons (if used) load from jsDelivr CDN and display correctly in chosen mode
 - [ ] Icons used sparingly (2-3 per slide max)
-- [ ] File is self-contained (no external deps besides Google Fonts and optionally jsDelivr icons)
+- [ ] Red Hat Design Tokens CSS loaded via jsDelivr CDN (`@rhds/tokens@3.0.2/css/global.min.css`)
+- [ ] `color-scheme` set correctly on `:root` (`dark` for Core Dark/Expressive Dark, `light` for Core Light)
+- [ ] Spacing uses `--rh-space-*` tokens with px fallbacks
+- [ ] Typography sizing uses `--rh-font-size-*` tokens with fallbacks where appropriate
+- [ ] Tags use `--rh-border-radius-pill` and `--rh-space-*` for padding
+- [ ] File is self-contained (no external deps besides Google Fonts, jsDelivr tokens, and optionally jsDelivr icons)
 - [ ] Progress indicator shows current/total
 - [ ] Narrative follows a clear story arc
 - [ ] Thank You slide is present as the final slide
