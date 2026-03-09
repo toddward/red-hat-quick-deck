@@ -280,43 +280,14 @@ so they adapt to each color mode automatically.
 https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/{set}/{icon}.svg
 ```
 
-**Icon sets:**
-| Set | Count | Purpose |
-|-----|-------|---------|
-| `standard` | 538 | Pictograms for presentations, marketing, and conceptual illustration |
-| `ui` | 542 | Interface icons for menus, actions, and controls |
-| `microns` | 19 | Tiny utility icons (chevrons, close, etc.) |
-| `social` | 36 | Platform logos (GitHub, LinkedIn, YouTube, etc.) |
+#### Choosing Icons — Read `references/rhds-icons.md`
 
-Browse all icons: https://red-hat-icons.netlify.app/
+**Before using any icon, always read `references/rhds-icons.md`** — it is the single source of truth for:
+- The full inventory of all 1,135 icons across 4 sets (`standard`, `ui`, `microns`, `social`)
+- **Common alias mappings** — many intuitive names don't match the actual RHDS names (e.g., `database` → `data`, `integration` → `interoperability`, `build` → `circuit`, `network` → `network-automation`)
+- **Semantic groupings** by topic (Cloud, Security, AI, DevOps, etc.) to quickly find the right icon for a slide's subject matter
 
-#### Curated Icon Reference
-
-These are the most useful icons for presentations, organized by topic. Use the `standard` set unless noted otherwise.
-
-**Cloud & Infrastructure**
-`cloud`, `cloud-upload`, `server`, `container`, `kubernetes-pod`, `microservices`, `virtual-machine`, `data-center`, `network`, `hybrid-cloud`, `private-cloud`, `public-cloud`
-
-**Security**
-`padlock-locked`, `padlock-unlocked`, `shield`, `firewall-a`, `key`, `fingerprint`, `identity`
-
-**Development & Code**
-`code` (ui), `api`, `git`, `terminal`, `bug`, `build`, `application`, `integration`
-
-**AI & Automation**
-`ai-ml`, `automation`, `robot`, `brain`, `ai-experience`, `machine-learning`
-
-**Business & Strategy**
-`chart-line`, `trophy`, `target`, `handshake`, `calendar`, `checklist`, `growth`, `cost`, `efficiency`
-
-**Data & Storage**
-`database`, `data`, `storage`, `hard-drive`, `archive`
-
-**Networking & Edge**
-`network`, `globe`, `wifi`, `satellite`, `edge`, `5g`, `connected`
-
-**Collaboration & People**
-`user`, `users`, `chat`, `email`, `presentation`, `support`, `community`
+Do **not** guess icon names. If you use a name that doesn't exist in the inventory, the icon will silently fail to load.
 
 #### Icon CSS
 
@@ -345,7 +316,7 @@ These are the most useful icons for presentations, organized by topic. Use the `
 <h2><img class="rh-icon small accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/shield.svg" alt=""> Security First</h2>
 
 <!-- Large icon for a stat slide -->
-<img class="rh-icon xl accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/growth.svg" alt="">
+<img class="rh-icon xl accent" src="https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/standard/graph-line-up.svg" alt="">
 <div class="big-number">3.2x</div>
 ```
 
