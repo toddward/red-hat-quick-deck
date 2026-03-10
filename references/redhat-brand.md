@@ -6,6 +6,24 @@ It is derived from the public Red Hat brand standards (https://www.redhat.com/en
 Also reference the `redhat-brand` skill by noelo (https://github.com/noelo/brand-skill/tree/main/redhat-brand)
 for additional brand application guidance in Claude artifacts.
 
+## Red Hat Design Tokens
+
+The official **@rhds/tokens** package (https://github.com/RedHat-UX/red-hat-design-tokens) provides
+CSS custom properties for colors, spacing, typography, borders, shadows, and more. The Quick Deck skill
+loads the tokens CSS via jsDelivr CDN and uses them for spacing, typography sizing, borders, and shadows.
+
+- **Package**: `@rhds/tokens` v3.0.2 on npm
+- **CDN**: `https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css`
+- **Token docs**: https://ux.redhat.com/tokens/
+- **Interactive browser**: https://red-hat-design-tokens.netlify.app/
+- **Naming convention**: `--rh-[category]-[type]-[variant]` (e.g., `--rh-space-lg`, `--rh-font-size-heading-xl`)
+
+**Note on colors:** The RHDS v3 token colors use `light-dark()` CSS functions and accessibility-adjusted
+values that differ from the traditional brand palette hex values listed below. For example,
+`--rh-color-brand-red-on-dark` is `#FF442B` (adjusted for dark-background legibility), not the classic
+`#ee0000` (red-50). This skill uses the traditional hex values for visual consistency with the established
+brand aesthetic, while using tokens for non-color properties.
+
 ## Core Color Palette
 
 ### Red (Brand Core)
@@ -21,20 +39,20 @@ for additional brand application guidance in Claude artifacts.
 | red-80      | #3f0000   | Deepest red |
 
 ### Neutral / Gray
-| Token       | Hex       | Usage |
-|-------------|-----------|-------|
-| white       | #ffffff   | Primary light background |
-| gray-10     | #f2f2f2   | Light background |
-| gray-20     | #e0e0e0   | Borders, dividers |
-| gray-30     | #c7c7c7   | Disabled states |
-| gray-40     | #a3a3a3   | Secondary text (light bg) |
-| gray-50     | #707070   | Muted text |
-| gray-60     | #4d4d4d   | Body text alternative |
-| gray-70     | #383838   | Dark surface |
-| gray-80     | #292929   | Dark background |
-| gray-90     | #1f1f1f   | Very dark background |
-| gray-95     | #151515   | UX Black — near-black |
-| black       | #000000   | True black |
+| Token       | Hex       | Usage | RHDS Token Reference |
+|-------------|-----------|-------|---------------------|
+| white       | #ffffff   | Primary light background | `--rh-color-surface-lightest` |
+| gray-10     | #f2f2f2   | Light background | `--rh-color-surface-lighter` |
+| gray-20     | #e0e0e0   | Borders, dividers | `--rh-color-surface-light` |
+| gray-30     | #c7c7c7   | Disabled states | `--rh-color-border-subtle-on-light` |
+| gray-40     | #a3a3a3   | Secondary text (light bg) | |
+| gray-50     | #707070   | Muted text | |
+| gray-60     | #4d4d4d   | Body text alternative | `--rh-color-text-secondary-on-light` |
+| gray-70     | #383838   | Dark surface | `--rh-color-border-subtle-on-dark` |
+| gray-80     | #292929   | Dark background | `--rh-color-surface-dark` |
+| gray-90     | #1f1f1f   | Very dark background | `--rh-color-surface-darker` |
+| gray-95     | #151515   | UX Black — near-black | `--rh-color-text-primary-on-light` |
+| black       | #000000   | True black | `--rh-color-surface-darkest` |
 
 ### Secondary Colors
 
@@ -96,14 +114,37 @@ for additional brand application guidance in Claude artifacts.
 ## Typography
 
 ### Font Families
-- **Red Hat Display** — Headlines, titles, large text. Bold, expressive, high-impact.
-- **Red Hat Text** — Body copy, paragraphs, readable content.
-- **Red Hat Mono** — Code, technical content, monospace needs.
+| Font | Usage | RHDS Token |
+|------|-------|-----------|
+| **Red Hat Display** | Headlines, titles, large text. Bold, expressive, high-impact. | `--rh-font-family-heading` |
+| **Red Hat Text** | Body copy, paragraphs, readable content. | `--rh-font-family-body-text` |
+| **Red Hat Mono** | Code, technical content, monospace needs. | `--rh-font-family-code` |
 
 All three are available on Google Fonts:
 - `https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap`
 - `https://fonts.googleapis.com/css2?family=Red+Hat+Text:ital,wght@0,300..700;1,300..700&display=swap`
 - `https://fonts.googleapis.com/css2?family=Red+Hat+Mono:ital,wght@0,300..700;1,300..700&display=swap`
+
+### Font Sizing Tokens
+| Token | Size |
+|-------|------|
+| `--rh-font-size-heading-2xl` | 3rem (48px) |
+| `--rh-font-size-heading-xl` | 2.5rem (40px) |
+| `--rh-font-size-heading-lg` | 2rem (32px) |
+| `--rh-font-size-heading-md` | 1.5rem (24px) |
+| `--rh-font-size-heading-sm` | 1.25rem (20px) |
+| `--rh-font-size-body-text-xl` | 1.25rem (20px) |
+| `--rh-font-size-body-text-lg` | 1.125rem (18px) |
+| `--rh-font-size-body-text-md` | 1rem (16px) |
+| `--rh-font-size-body-text-sm` | 0.875rem (14px) |
+| `--rh-font-size-body-text-xs` | 0.75rem (12px) |
+
+### Font Weight Tokens
+| Token | Value |
+|-------|-------|
+| `--rh-font-weight-regular` | 400 |
+| `--rh-font-weight-medium` | 500 |
+| `--rh-font-weight-bold` | 700 |
 
 ### Typography Rules
 - Headlines: Red Hat Display, Bold or Black weight
@@ -140,6 +181,46 @@ Red Hat publishes an official icon library: **@rhds/icons** (https://github.com/
 - **CDN source**: Available via jsDelivr at `https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/{set}/{icon}.svg`
 - Icons are monochrome SVGs designed to be recolored via CSS `filter` properties
 - Use the `standard` set for presentation pictograms; `ui` set for interface-style icons
+
+## Design Token Reference
+
+### Spacing Tokens (`--rh-space-*`)
+All values are multiples of 4px. Use these for consistent padding, margins, and gaps.
+
+| Token | Value |
+|-------|-------|
+| `--rh-space-xs` | 4px |
+| `--rh-space-sm` | 8px |
+| `--rh-space-md` | 16px |
+| `--rh-space-lg` | 24px |
+| `--rh-space-xl` | 32px |
+| `--rh-space-2xl` | 48px |
+| `--rh-space-3xl` | 64px |
+| `--rh-space-4xl` | 80px |
+| `--rh-space-5xl` | 96px |
+| `--rh-space-6xl` | 112px |
+| `--rh-space-7xl` | 128px |
+
+### Border Tokens
+| Token | Value |
+|-------|-------|
+| `--rh-border-width-sm` | 1px |
+| `--rh-border-width-md` | 2px |
+| `--rh-border-width-lg` | 3px |
+| `--rh-border-radius-sharp` | 0px |
+| `--rh-border-radius-default` | 3px |
+| `--rh-border-radius-pill` | 64px |
+
+### Box Shadow Tokens
+| Token | Value |
+|-------|-------|
+| `--rh-box-shadow-sm` | `0 2px 4px 0 rgba(21,21,21,0.2)` |
+| `--rh-box-shadow-md` | `0 4px 6px 1px rgba(21,21,21,0.25)` |
+| `--rh-box-shadow-lg` | `0 6px 8px 2px rgba(21,21,21,0.3)` |
+| `--rh-box-shadow-xl` | `0 8px 24px 3px rgba(21,21,21,0.35)` |
+
+### Opacity Tokens (`--rh-opacity-*`)
+Values from `--rh-opacity-0` (0%) through `--rh-opacity-100` (100%) in increments of 10.
 
 ## Key Brand Principles
 1. **Use red with intention** — pops of red-50 to highlight, never flood
