@@ -80,7 +80,30 @@ https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&fa
 - **Red Hat Text** (`--rh-font-family-body-text`) — Body copy, paragraphs (Regular weight)
 - **Red Hat Mono** (`--rh-font-family-code`) — Code, technical content, tags, monospace
 
-**Font sizing tokens:** `--rh-font-size-heading-2xl` (3rem) through `--rh-font-size-heading-sm` (1.25rem) for headings; `--rh-font-size-body-text-xl` (1.25rem) through `--rh-font-size-body-text-xs` (0.75rem) for body text. Always include px/rem fallbacks.
+**Font sizing tokens (from `@rhds/tokens`):**
+
+| Token | Size | Usage |
+|-------|------|-------|
+| `--rh-font-size-heading-2xl` | 3rem (48px) | Title slide headline |
+| `--rh-font-size-heading-xl` | 2.5rem (40px) | Section headlines, big impact text |
+| `--rh-font-size-heading-lg` | 2rem (32px) | Slide headlines |
+| `--rh-font-size-heading-md` | 1.5rem (24px) | Sub-headlines |
+| `--rh-font-size-heading-sm` | 1.25rem (20px) | Card titles, labels |
+| `--rh-font-size-body-text-xl` | 1.25rem (20px) | Lead paragraphs, subtitles |
+| `--rh-font-size-body-text-lg` | 1.125rem (18px) | Body text on slides |
+| `--rh-font-size-body-text-md` | 1rem (16px) | Standard body |
+| `--rh-font-size-body-text-sm` | 0.875rem (14px) | Captions, attributions |
+| `--rh-font-size-body-text-xs` | 0.75rem (12px) | Tags, breadcrumbs, fine print |
+
+Example usage:
+```css
+h1 { font-size: var(--rh-font-size-heading-2xl, 3rem); }
+h2 { font-size: var(--rh-font-size-heading-lg, 2rem); }
+.subtitle { font-size: var(--rh-font-size-body-text-xl, 1.25rem); }
+.tag { font-size: var(--rh-font-size-body-text-xs, 0.75rem); }
+```
+
+Always include px/rem fallbacks.
 
 **Typography Rules:**
 - Color for text: black or white for body; red-50 for accent headlines/pull quotes only
@@ -246,9 +269,23 @@ Use the official spacing tokens for padding, margins, and gaps (4px base scale):
 
 ### Borders & Shadows (from `@rhds/tokens`)
 
-- Border widths: `--rh-border-width-sm` (1px), `--rh-border-width-md` (2px), `--rh-border-width-lg` (3px)
-- Border radii: `--rh-border-radius-sharp` (0px), `--rh-border-radius-default` (3px), `--rh-border-radius-pill` (64px)
-- Box shadows: `--rh-box-shadow-sm`, `--rh-box-shadow-md`, `--rh-box-shadow-lg`, `--rh-box-shadow-xl`
+```css
+/* Border widths */
+--rh-border-width-sm: 1px;    /* Default borders, tag outlines */
+--rh-border-width-md: 2px;    /* Emphasized borders, accent lines */
+--rh-border-width-lg: 3px;    /* Heavy emphasis, decorative rules */
+
+/* Border radii */
+--rh-border-radius-sharp: 0px;       /* No rounding — architecture boxes */
+--rh-border-radius-default: 3px;     /* Subtle rounding — cards, surfaces */
+--rh-border-radius-pill: 64px;       /* Full pill — tags, badges */
+
+/* Box shadows — use for elevated surfaces and architecture diagram depth */
+--rh-box-shadow-sm: 0 2px 4px 0 rgba(21, 21, 21, 0.2);      /* Subtle lift */
+--rh-box-shadow-md: 0 4px 6px 1px rgba(21, 21, 21, 0.25);    /* Cards */
+--rh-box-shadow-lg: 0 6px 8px 2px rgba(21, 21, 21, 0.3);     /* Modals, panels */
+--rh-box-shadow-xl: 0 8px 24px 3px rgba(21, 21, 21, 0.35);   /* Hero elements */
+```
 
 ### Tag / Pill Styling
 
@@ -277,6 +314,14 @@ Red Hat publishes an official icon library (`@rhds/icons`) with 1,135 SVGs. Use 
 **CDN URL pattern:** `https://cdn.jsdelivr.net/npm/@rhds/icons@2.1.0/{set}/{icon}.svg`
 
 **Icon sets:** `standard` (538 pictograms), `ui` (542 interface), `microns` (19 tiny), `social` (36 platform logos). Browse all: https://red-hat-icons.netlify.app/
+
+**Important — Common alias mappings:** Many intuitive icon names don't match the actual RHDS names. Always verify before using:
+- `database` → use `data`
+- `integration` → use `interoperability`
+- `build` → use `circuit`
+- `network` → use `network-automation`
+- `chart-line` → use `graph-line-up`
+- Do **not** guess icon names. If a name doesn't exist, the icon will silently fail to load.
 
 **Curated icons for presentations (standard set unless noted):**
 - Cloud & Infrastructure: `cloud`, `server`, `container`, `kubernetes-pod`, `microservices`, `virtual-machine`, `data-center`, `network`, `hybrid-cloud`
@@ -382,7 +427,7 @@ Every deck should include these (adapt as needed):
 5. **Architecture / Diagram Slide** — CSS-based box diagrams (flexbox/grid), use icons (`.rh-icon.small`) inside boxes alongside text labels, arrows with Unicode (→, ↓), red-50 on key innovation
 6. **Quote Slide** — Large pull quote in Red Hat Display, attribution below, red-50 decorative quotation mark
 7. **Call-to-Action / Closing Slide** — Clear next steps, contact info, resources
-8. **Thank You Slide (always final)** — Large "Thank You" (accent "You" in red-50), author name/role/org centered, large Red Hat logo, optional contact info in muted text, prominent ambient glow, generous whitespace
+8. **Thank You Slide (Required — always the final slide)** — Large "Thank You" in Red Hat Display Black weight, accent word ("You") in red-50, author name/role/org centered below, large Red Hat logo centered beneath attribution, optional contact email/social/URL in small muted text. Keep it clean — no tags, no body text, generous whitespace. The ambient glow effect should be prominent on this slide for a strong visual close.
 
 ---
 
@@ -511,7 +556,12 @@ Include this in every deck:
 2. **Choose a story arc**: Problem→Tension→Resolution (new tools/tech), Myth-Busting (challenging thinking), or Journey (case studies).
 3. **Outline first**: Write the slide headlines FIRST. Headlines alone should tell the complete story. Show the user the outline before generating full HTML if the topic is complex.
 4. **Write each slide**: Headline as assertion, concise supporting content, appropriate slide type, source attributions, contextual notes with references and links.
-5. **AI image opportunities**: Identify slides where a custom image would help, and note suggested prompts in contextual notes.
+5. **AI image opportunities**: As you build slides, identify moments where a custom AI-generated image would elevate the deck. For each opportunity, add a note in the contextual notes like:
+   ```
+   [IMAGE OPPORTUNITY] Prompt: "[detailed image generation prompt describing the desired visual,
+   style, composition, colors, and mood — incorporating Red Hat brand colors where appropriate]"
+   ```
+   Good candidates: title slide hero visuals (abstract, on-brand), concept illustrations (visual metaphors), background textures, infographic-style data visualizations. When writing prompts, specify: dark background compatible (for dark mode decks), Red Hat color palette (reds, dark grays, subtle teals/purples), no text in the image, and aspect ratio suited for the slide layout (usually 16:9).
 
 ## Quality Checklist
 
@@ -529,8 +579,9 @@ Before delivering, verify:
 - [ ] Click/tap navigation works
 - [ ] Contextual notes present with references and links
 - [ ] Sources attributed on data slides
+- [ ] At least one AI image opportunity is noted in contextual notes
 - [ ] Icons (if used) load from jsDelivr CDN and display correctly in chosen mode
-- [ ] Icons used sparingly (2-3 per slide max)
+- [ ] Icons are used sparingly (2-3 per slide max) and enhance rather than clutter
 - [ ] Red Hat Design Tokens CSS loaded via jsDelivr CDN (`@rhds/tokens@3.0.2/css/global.min.css`)
 - [ ] `color-scheme` set correctly on `:root` (`dark` for Core Dark/Expressive Dark, `light` for Core Light)
 - [ ] Spacing uses `--rh-space-*` tokens with px fallbacks
@@ -538,12 +589,29 @@ Before delivering, verify:
 - [ ] Tags use `--rh-border-radius-pill` and `--rh-space-*` for padding
 - [ ] File is self-contained (no external deps besides Google Fonts, jsDelivr tokens, and optionally jsDelivr icons)
 - [ ] Progress indicator shows current/total
-- [ ] Narrative follows a clear story arc
-- [ ] Thank You slide is present as the final slide
+- [ ] Narrative follows a clear story arc with emotional rhythm
+- [ ] Thank You slide is present as the final slide with author name, role, and Red Hat logo
 - [ ] Accent word(s) in title headline are colored red-50
+
+## Example: Target Aesthetic
+
+The title slide should achieve this level of cinematic intentionality:
+
+```
+Breadcrumb:    [RH Logo SVG] › NAPS STP               [logo small + font-mono, small, muted]
+Label:         —— NAPS STP WORKING GROUP · FEB 27, 2026   [font-mono, red-50, small, tracking-wide]
+Headline:      Your AI Assistant                       [Red Hat Display, Black, white, ~64px]
+               Should Live Where You Work              ["Live Where You Work" in red-50]
+Subtitle:      A fully local, air-gap-ready AI...      [font-body, gray-40, ~18px]
+Tags:          [Local-First] [Air-Gap Ready] ...       [pill style, monospace, outlined]
+Attribution:   Todd Wardzinski · Architect · Red Hat    [font-body, gray-40, small]
+Background:    Black with subtle red radial glow       [upper-right corner, very low opacity]
+```
+
+Every title slide should feel this cinematic and intentional.
 
 ## Viewer Tips (include in first contextual note)
 - Arrow keys or click to navigate
-- Press 'N' to toggle contextual notes
+- Press 'N' to toggle contextual notes — references, links, and additional context for each slide
 - Works in any modern browser — share the HTML file directly
-- For best results, use fullscreen (F11)
+- For best results, use fullscreen (F11) or present in a browser tab
