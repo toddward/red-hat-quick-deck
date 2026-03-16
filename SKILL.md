@@ -3,12 +3,14 @@ name: red-hat-quick-deck
 description: >
   Create beautiful, shareable HTML-based slide presentations styled to Red Hat brand standards.
   Generates single-file, self-contained HTML decks with click/keyboard navigation, story-arc-driven
-  narrative structure, and cinematic dark-mode aesthetics. Use this skill whenever the user wants to
-  create a slide deck, presentation, quick deck, quick slides, pitch deck, talk, or briefing that should follow
-  Red Hat branding. Also trigger when the user mentions "quick deck", "quick slides", "HTML slides", "shareable deck",
-  "presentation for [audience]", "talk about [topic]", or asks to present technical content in Red Hat
-  style. This skill is specifically for HTML output — if the user explicitly asks for .pptx, use the
-  pptx skill instead, but suggest this skill as an alternative for easy sharing.
+  narrative structure, and cinematic dark-mode aesthetics. Supports embedded videos (YouTube, Vimeo,
+  direct URLs) and linked media (memes, GIFs, images) with brand-consistent styling. Use this skill
+  whenever the user wants to create a slide deck, presentation, quick deck, quick slides, pitch deck,
+  talk, or briefing that should follow Red Hat branding. Also trigger when the user mentions "quick deck",
+  "quick slides", "HTML slides", "shareable deck", "presentation for [audience]", "talk about [topic]",
+  or asks to present technical content in Red Hat style. This skill is specifically for HTML output — if
+  the user explicitly asks for .pptx, use the pptx skill instead, but suggest this skill as an alternative
+  for easy sharing.
 ---
 
 # Red Hat Quick Deck
@@ -36,6 +38,8 @@ A single `.html` file that:
 - Looks cinematic and professional on screen, projector, or shared link
 - Follows a deliberate story arc that builds a persuasive narrative
 - Includes a contextual notes panel (toggled with 'N' key) for additional references, links, and deeper context on each slide
+- Supports embedded videos (YouTube, Vimeo, direct URLs) with auto-pause on slide change
+- Supports linked media (memes, GIFs, images) with responsive display and optional captions
 - Is responsive and works on mobile for async viewing
 
 ## Design System
@@ -374,6 +378,65 @@ Example usage:
 --rh-box-shadow-xl: 0 8px 24px 3px rgba(21, 21, 21, 0.35);   /* Hero elements */
 ```
 
+### Video Container Styling
+
+```css
+/* === VIDEO CONTAINER === */
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--rh-border-radius-default, 3px);
+  overflow: hidden;
+  box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+  background: var(--bg-secondary);
+  align-self: center;
+}
+.video-container iframe,
+.video-container video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+```
+
+### Media Container Styling (Memes, GIFs, Linked Images)
+
+```css
+/* === MEDIA CONTAINER === */
+.media-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  max-height: 65vh;
+  padding: var(--rh-space-md, 16px) 0;
+  align-self: center;
+}
+.slide-media {
+  display: block;
+  max-width: 90%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--rh-border-radius-default, 3px);
+  box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+}
+.media-caption {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: var(--rh-space-md, 16px);
+  max-width: 720px;
+  align-self: center;
+}
+```
+
 ### Tag / Pill Styling
 
 The reference uses outlined pills for categorization (e.g., "Local-First", "Air-Gap Ready"). Style them
@@ -442,6 +505,8 @@ using design tokens for sizing, spacing, and borders:
     </div>
 
     <!-- CONTENT SLIDES (no logo — brand presence via red accents) -->
+    <!-- VIDEO SLIDES use .video-container with iframe or video tag -->
+    <!-- MEDIA SLIDES use .media-container with img tag (memes, GIFs, linked images) -->
 
     <!-- FINAL SLIDE: CTA (includes larger logo) -->
     <div class="slide">
@@ -510,7 +575,218 @@ Every deck should include these slide types (adapt as needed):
 - Contact info or resources
 - QR code placeholder if relevant (note in contextual notes)
 
-#### 8. Thank You Slide (Required — always the final slide)
+#### 8. Video Slide
+- Use when the user provides a video URL or asks to embed a video
+- Supports **YouTube**, **Vimeo** (via thumbnail + click-to-embed iframe), and **direct video URLs** (via `<video>` tag)
+- Headline with optional accent word above the video
+- 16:9 responsive container with brand-consistent framing (shadow, rounded corners)
+- Optional caption below the video for context
+- Source attribution at bottom
+- Click the play button to start the video; controls are visible for pause/seek
+
+**⚠ IMPORTANT — When a user adds a video slide, you MUST inform them:**
+
+> **Inline video playback requires serving this deck via HTTP or HTTPS.**
+> YouTube and Vimeo embeds do not work when opening the HTML file directly
+> from your filesystem (`file://` protocol) — this is a browser security
+> restriction that cannot be worked around.
+>
+> To enable inline video playback:
+> - **Quick local server:** Run `python3 -m http.server` in the deck's folder,
+>   then open `http://localhost:8000/deck-name.html`
+> - **Or use:** `npx serve`, VS Code Live Server, or any static file host
+> - **Or host it:** Upload to any web server, GitHub Pages, S3, etc.
+>
+> When opened as a local file, clicking a video will open it on YouTube in a
+> new browser tab instead.
+
+This message should be delivered **every time** a video slide is added to a deck. Do not skip it.
+
+**URL conversion rules:**
+- YouTube `https://www.youtube.com/watch?v=VIDEO_ID` → `https://www.youtube-nocookie.com/embed/VIDEO_ID?enablejsapi=1&mute=1`
+- YouTube `https://youtu.be/VIDEO_ID` → `https://www.youtube-nocookie.com/embed/VIDEO_ID?enablejsapi=1&mute=1`
+- Vimeo `https://vimeo.com/VIDEO_ID` → `https://player.vimeo.com/video/VIDEO_ID?muted=1`
+- Direct `.mp4`, `.webm`, `.ogg` URLs → use `<video>` tag with `muted` attribute
+
+**YouTube/Vimeo implementation — thumbnail + open-in-new-tab pattern:**
+
+YouTube iframes have multiple failure modes: `file://` protocol blocks them (Error 153), ad blockers
+block YouTube's tracking requests (`ERR_BLOCKED_BY_CLIENT`), and CSP policies can prevent embedding.
+To ensure decks work reliably everywhere, **always use the thumbnail + new-tab pattern**:
+
+1. Show the YouTube thumbnail as an image with a branded red play button overlay
+2. On click, open the video on youtube.com in a new browser tab
+3. The presenter's slide stays visible — they can return to it after watching
+
+This approach has zero dependencies on iframes, works from any protocol, and is immune to ad blockers.
+
+The thumbnail URL pattern: `https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg`
+(falls back to `hqdefault.jpg` if maxres isn't available)
+
+**Required CSS for video slides:**
+```css
+.video-thumbnail {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+}
+.video-play-btn {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 80px; height: 80px; background: rgba(238,0,0,0.9); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; z-index: 2;
+  transition: background 0.2s ease;
+}
+.video-play-btn::after {
+  content: ''; display: block; width: 0; height: 0;
+  border-style: solid; border-width: 14px 0 14px 24px;
+  border-color: transparent transparent transparent #fff; margin-left: 4px;
+}
+.video-container:hover .video-play-btn { background: rgba(238,0,0,1); }
+```
+
+**Required JavaScript** (inside the navigation IIFE, BEFORE the navigation click handler):
+```javascript
+// Click-to-play for video thumbnails
+// HTTP/HTTPS: embed iframe inline for seamless playback
+// file://: open in new tab (YouTube blocks iframe embeds from file:// protocol)
+document.addEventListener('click', (e) => {
+  const vc = e.target.closest('.video-container[data-video-id]');
+  if (vc) {
+    e.stopImmediatePropagation(); // prevent navigation handler from firing
+    const vid = vc.dataset.videoId;
+    if (window.location.protocol === 'file:') {
+      window.open('https://www.youtube.com/watch?v=' + vid, '_blank');
+    } else {
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + vid + '?autoplay=1';
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      vc.innerHTML = '';
+      vc.appendChild(iframe);
+    }
+    return;
+  }
+});
+```
+
+**Why `e.stopImmediatePropagation()`**: When the click handler replaces the video container's
+innerHTML, the clicked element (play button) becomes detached from the DOM. Without stopping
+propagation, the navigation click handler can't find `.video-container` via `closest()` on the
+detached target and accidentally advances the slide.
+
+**Inline video playback note**: Include in the first slide's contextual notes and the nav hint
+that videos play inline when served via HTTP (`python3 -m http.server`). When opened as a local
+file, videos open on YouTube in a new tab instead.
+
+```html
+<!-- YouTube video (thumbnail + new-tab pattern) -->
+<div class="slide" data-notes="[notes]">
+  <div class="slide-label animate-in">—— LABEL</div>
+  <h2 class="animate-in">Headline <span class="accent">with accent</span></h2>
+  <div class="video-container animate-in" data-video-id="VIDEO_ID">
+    <img class="video-thumbnail" src="https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg" alt="Video description">
+    <div class="video-play-btn"></div>
+  </div>
+  <div class="media-caption animate-in">Optional context about the video</div>
+  <div class="source animate-in">Source attribution</div>
+</div>
+
+<!-- Direct video file (works from file:// natively) -->
+<div class="slide" data-notes="[notes]">
+  <div class="slide-label animate-in">—— LABEL</div>
+  <h2 class="animate-in">Headline <span class="accent">with accent</span></h2>
+  <div class="video-container animate-in">
+    <video controls muted preload="metadata">
+      <source src="https://example.com/video.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="media-caption animate-in">Optional context</div>
+  <div class="source animate-in">Source attribution</div>
+</div>
+```
+
+#### 9. Media Slide (Memes, GIFs, Linked Images, Giphy)
+- Use when the user provides an image/meme/GIF URL or asks to include visual media
+- Supports any image format: JPG, PNG, GIF (including animated), WebP, SVG
+- Supports **Giphy** GIFs (see URL conversion rules below)
+- Responsive container that preserves the original aspect ratio
+- Optional caption below for humor, context, or commentary — use a lighter tone for memes
+- Source / credit line at bottom
+- Works for memes, reaction GIFs, diagrams, screenshots, photos — any linked image
+- **Important**: Use full-resolution image URLs, not thumbnails. For imgflip templates, use the
+  `https://imgflip.com/s/meme/Template-Name.jpg` pattern (full-size) instead of
+  `https://i.imgflip.com/2/xxxxx.jpg` (150x150 thumbnails)
+
+**Media URL conversion rules:**
+- Giphy page `https://giphy.com/gifs/SLUG-ID` → `https://media.giphy.com/media/ID/giphy.gif`
+- Giphy short `https://gph.is/SHORTCODE` → resolve to full URL, then extract ID for `https://media.giphy.com/media/ID/giphy.gif`
+- Giphy direct links (`media.giphy.com`, `media0-4.giphy.com`) → use as-is
+- Imgflip templates → use `https://imgflip.com/s/meme/Template-Name.jpg` (full-size)
+- Direct image URLs (`.jpg`, `.png`, `.gif`, `.webp`, `.svg`) → use as-is
+- **Local files** (via `@file`, file path, or "use this image") → embed as base64 data URI (see below)
+
+#### Local File / @file Image Support
+
+When the user provides a local file path or references an image via `@file`, embed the image
+directly into the HTML as a **base64 data URI**. This keeps the deck fully self-contained and
+portable — the image travels with the HTML file.
+
+**Encoding workflow:**
+
+1. Determine the MIME type from the file extension:
+   - `.png` → `image/png`
+   - `.jpg` / `.jpeg` → `image/jpeg`
+   - `.gif` → `image/gif`
+   - `.webp` → `image/webp`
+   - `.svg` → `image/svg+xml`
+
+2. Base64-encode the file using a shell command:
+   ```bash
+   base64 -i /path/to/image.png | tr -d '\n'
+   ```
+
+3. Construct the data URI and use it as the `src`:
+   ```html
+   <img src="data:image/png;base64,iVBORw0KGgo..." alt="Description" class="slide-media">
+   ```
+
+**Important notes:**
+- This works for any image the user can reference — screenshots, diagrams, downloaded memes,
+  photos, exported charts, etc.
+- Base64 increases file size by ~33%, so very large images (>5MB) may make the HTML file unwieldy.
+  For large images, suggest the user resize or compress first.
+- Animated GIFs can be embedded as base64 but will be large. For animated content, prefer Giphy
+  links when possible.
+- The user may provide images by:
+  - Using `@file` syntax: `@screenshot.png` or `@/Users/name/Desktop/diagram.png`
+  - Pasting a file path: `/tmp/my-meme.jpg`
+  - Saying "use this image" with a file reference in context
+  - Dragging an image into the conversation
+
+```html
+<!-- Standard image/meme -->
+<div class="slide" data-notes="[notes]">
+  <div class="slide-label animate-in">—— LABEL</div>
+  <h2 class="animate-in">Headline <span class="accent">with accent</span></h2>
+  <div class="media-container animate-in">
+    <img src="https://example.com/meme.gif" alt="Descriptive alt text" class="slide-media">
+  </div>
+  <div class="media-caption animate-in">Optional witty caption or context</div>
+  <div class="source animate-in">Source / credit</div>
+</div>
+
+<!-- Giphy GIF example -->
+<div class="slide" data-notes="[notes]">
+  <div class="slide-label animate-in">—— LABEL</div>
+  <h2 class="animate-in">Headline <span class="accent">with accent</span></h2>
+  <div class="media-container animate-in">
+    <img src="https://media.giphy.com/media/GIPHY_ID/giphy.gif" alt="Descriptive alt text" class="slide-media">
+  </div>
+  <div class="media-caption animate-in">Caption</div>
+  <div class="source animate-in">via Giphy</div>
+</div>
+```
+
+#### 10. Thank You Slide (Required — always the final slide)
 - Large "Thank You" headline in Red Hat Display, Black weight
 - Accent word ("You") in red-50
 - Author name, role, and organization centered below
@@ -548,7 +824,21 @@ For each slide:
 - Add source attributions where data is cited
 - Add contextual notes with references, links, deeper explanations, and related resources that let viewers dive deeper into the slide's topic
 
-### Step 5: AI Image Opportunities
+### Step 5: Note Video & Media Opportunities
+As you build the narrative, identify slides where a video or meme could strengthen the story —
+a demo video after an architecture slide, a reaction meme to break tension after a dense section,
+etc. **Do not insert Video or Media slides during initial generation.** Instead, note opportunities
+in the contextual notes like:
+
+```
+[VIDEO OPPORTUNITY] A short demo of [feature] here would reinforce the architecture on the previous slide.
+[MEME OPPORTUNITY] A well-placed meme here could break the tension after the dense comparison slide.
+```
+
+After delivering the deck, the post-generation prompt (see "Post-Generation: Video & Media Placement")
+will guide the user to add these if they choose.
+
+### Step 6: AI Image Opportunities
 As you build slides, identify moments where a custom AI-generated image would elevate the deck.
 For each opportunity, add a note in the contextual notes like:
 
@@ -587,12 +877,34 @@ Include this navigation system in every deck:
 
   totalEl.textContent = slides.length;
 
+  function pauseAllMedia() {
+    // Pause HTML5 video elements on inactive slides
+    document.querySelectorAll('.slide:not(.active) video').forEach(v => v.pause());
+    // Pause YouTube/Vimeo iframes on inactive slides
+    document.querySelectorAll('.slide:not(.active) iframe').forEach(f => {
+      f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+      f.contentWindow.postMessage('{"method":"pause"}', '*');
+    });
+  }
+
+  function playActiveMedia() {
+    // Autoplay HTML5 video on the active slide
+    document.querySelectorAll('.slide.active video').forEach(v => v.play());
+    // Autoplay YouTube/Vimeo iframes on the active slide
+    document.querySelectorAll('.slide.active iframe').forEach(f => {
+      f.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+      f.contentWindow.postMessage('{"method":"play"}', '*');
+    });
+  }
+
   function show(i) {
     slides.forEach((s, j) => {
       s.classList.toggle('active', j === i);
       s.style.display = j === i ? 'flex' : 'none';
     });
     currentEl.textContent = i + 1;
+    pauseAllMedia();
+    playActiveMedia();
     // Update contextual notes if visible
     if (notesVisible && notesPanel) {
       const note = slides[i].dataset.notes || '';
@@ -614,7 +926,7 @@ Include this navigation system in every deck:
   });
 
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.controls') || e.target.closest('.notes-panel')) return;
+    if (e.target.closest('.controls') || e.target.closest('.notes-panel') || e.target.closest('.video-container') || e.target.closest('.media-container')) return;
     const x = e.clientX / window.innerWidth;
     x > 0.5 ? next() : prev();
   });
@@ -674,11 +986,18 @@ Before delivering the HTML file, verify:
 - [ ] Spacing uses `--rh-space-*` tokens with px fallbacks (e.g., `var(--rh-space-lg, 24px)`)
 - [ ] Typography sizing uses `--rh-font-size-*` tokens with fallbacks where appropriate
 - [ ] Tags use `--rh-border-radius-pill` and `--rh-space-*` for padding
-- [ ] File is self-contained (no external dependencies besides Google Fonts, jsDelivr icons, and jsDelivr design tokens)
+- [ ] Video slides (if any) use the thumbnail + click-to-embed pattern with `data-video-id` attributes
+- [ ] Video slides (if any) include the protocol-aware JS handler (inline iframe on HTTP, new tab on file://)
+- [ ] **User was informed** that inline video requires serving via HTTP/HTTPS (mandatory notification)
+- [ ] Media slides (if any) have descriptive alt text on `<img>` tags
+- [ ] Media/video containers are excluded from click-to-navigate (click guard in JS)
+- [ ] File is self-contained (no external dependencies besides Google Fonts, jsDelivr icons, jsDelivr design tokens, and user-provided video/image URLs)
 - [ ] Progress indicator shows current/total slides
 - [ ] The narrative follows a clear story arc with emotional rhythm
 - [ ] **Thank You slide** is present as the final slide with author name, role, and Red Hat logo
 - [ ] The accent word(s) in the title slide headline are colored red-50 for emphasis
+- [ ] Video/media opportunities are noted in contextual notes (not inserted during initial generation)
+- [ ] **Post-generation prompt** was shown to the user after delivering the deck, offering to add videos or memes
 
 ## Example: Mapping the OpenCode Screenshot to This System
 
@@ -701,6 +1020,77 @@ This is the target aesthetic. Every title slide should feel this cinematic and i
 
 Save the generated HTML to `/mnt/user-data/outputs/[deck-name].html` and present it to the user.
 The filename should be kebab-case derived from the deck title.
+
+## Post-Generation: Video & Media Placement
+
+Video and media slides are **not** part of the initial deck generation. They are added in a second
+pass after the user has reviewed the generated deck structure. This keeps the initial creation
+focused on narrative flow, and lets the user make informed decisions about where media fits.
+
+### Workflow
+
+After delivering the initial deck, **always prompt the user** with:
+
+> "Would you like to add any **videos** or **memes / images** to the deck? If so, tell me:
+> 1. The **URL** of the video or image — or a **local file path** / `@file` reference for images on your machine
+> 2. **Where** it should go — **in** an existing slide, **before/after** a specific slide, or **replacing** a slide
+>
+> You can add as many as you'd like, one at a time or all at once."
+
+### Placement Rules
+
+When the user provides a URL and placement:
+
+1. **Identify the media type** from the source:
+   - YouTube / Vimeo links → Video embed (thumbnail-first pattern)
+   - Direct `.mp4` / `.webm` / `.ogg` → Video embed
+   - Giphy links (`giphy.com`, `gph.is`, `media.giphy.com`) → Media embed (convert to direct GIF URL)
+   - Image URLs (`.jpg`, `.png`, `.gif`, `.webp`, `.svg`) or meme links → Media embed
+   - Imgflip links → Media embed (convert to full-size template URL)
+   - **Local file path or `@file` reference** → Media embed (base64-encode and inline as data URI)
+   - If ambiguous, ask the user
+
+2. **Placement modes** (default to "in" for content-rich slides, "after" for standalone media):
+
+   - **"In slide 3"** → embed the video/media directly into the existing slide, below the headline
+     and body text. Keep the slide's existing content and add a `.video-container` or
+     `.media-container` after the body content. Reduce body text if needed to prevent overflow.
+     Best for: adding a demo video to an architecture slide, a supporting image to a content slide,
+     or a reaction meme alongside a quote.
+
+   - **"After slide 3"** → insert a new dedicated Video/Media slide between current slides 3 and 4.
+     Best for: standalone videos or memes that deserve their own moment in the narrative.
+
+   - **"Before slide 5"** → insert a new dedicated slide before slide 5.
+
+   - **"Replace slide 4"** → swap slide 4's content with a Video/Media slide, keeping the
+     narrative position.
+
+3. **For new standalone slides**, write a headline that fits the surrounding narrative context. Use
+   the headlines of the adjacent slides to maintain story flow. Ask the user if you're unsure what
+   headline to use.
+
+4. **For in-slide embeds**, keep the existing headline and body content. Add the media below the
+   body text. If the slide becomes too crowded, offer to move some body text into contextual notes
+   or split into two slides.
+
+5. **Preserve the navigation JS** — no changes needed; the `show()` function already handles
+   autoplay/pause for any Video or Media slides in the deck.
+
+6. **Update the slide count** in the progress indicator if slides were added (the JS handles this
+   automatically via `slides.length`).
+
+7. **Re-deliver the updated file** and ask if the user wants to add more or adjust placement.
+
+### Iterative Refinement
+
+The user may want to:
+- Add multiple videos/memes in one pass — process all of them
+- Move a video/meme to a different position — remove from old spot, insert at new spot
+- Remove a video/meme they added — delete that slide
+- Change the caption or headline on a media slide
+
+Support all of these as natural follow-up edits after the initial placement.
 
 ## Tips for Viewers
 
