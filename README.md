@@ -1,6 +1,6 @@
 # Red Hat Quick Deck
 
-A Claude Code skill that generates stunning, self-contained HTML slide presentations styled to Red Hat brand standards. Ask for a "quick deck" on any topic and get a single `.html` file you can open in any browser, email, or host anywhere.
+An [Agent Skill](https://github.com/anthropics/agent-skill) that generates stunning, self-contained HTML slide presentations styled to Red Hat brand standards. Ask for a "quick deck" on any topic and get a single `.html` file you can open in any browser, email, or host anywhere. Works in Claude Code, Cursor, OpenCode, and anything else that supports the Agent Skills open standard.
 
 ## What It Does
 
@@ -12,6 +12,13 @@ A Claude Code skill that generates stunning, self-contained HTML slide presentat
 - Uses story-arc-driven narrative structures to make technical content compelling
 - Includes keyboard/click/touch navigation, slide counter, and contextual notes panel (press `N`) with references, links, and deeper context
 - Suggests AI image opportunities in contextual notes for visual enhancement
+
+### v2: Rich Media Support
+
+- **Images via URL** — drop in any image URL and it renders on-brand, properly sized and positioned within the slide layout
+- **Memes & GIFs** — reference a meme or animated GIF and it embeds inline, because sometimes a well-placed meme says more than three bullet points
+- **Embedded video** — YouTube links and MP4 URLs embed directly into slides as playable video
+- **Flexible media handling** — images, video, and animated content all respect the brand styling, color mode, and responsive layout automatically
 
 ## Files
 
