@@ -42,3 +42,7 @@ The skill will ask your preferred visual mode (dark/light), research the topic i
 ## Slide Types
 
 Title, Content, Big Number/Stat, Comparison, Architecture Diagram, Quote, Call-to-Action, and Thank You slides — all styled to Red Hat brand standards.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute this project. The original author, Todd Wardzinski, kindly asks that you provide attribution back to this project when using or redistributing it.
