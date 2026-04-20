@@ -20,14 +20,42 @@ An [Agent Skill](https://github.com/anthropics/agent-skill) that generates stunn
 - **Embedded video** — YouTube links and MP4 URLs embed directly into slides as playable video
 - **Flexible media handling** — images, video, and animated content all respect the brand styling, color mode, and responsive layout automatically
 
+### v2.1: Markdown authoring (optional)
+
+Every generated deck can now be delivered as both a single-file `.html`
+**and** an editable Marp markdown source. Users who want to tweak wording,
+reorder slides, or tune visuals just edit the `.md` and re-run the render
+script — the HTML output is byte-for-byte equivalent to direct authoring.
+
+- Works anywhere Bash + Node 18+ are available (Claude Code, terminal, CI).
+- Falls back transparently to direct HTML authoring on environments without
+  shell access (Claude.ai web, Gemini Gems).
+- See `references/markdown-authoring.md` for the full authoring guide.
+
+Re-render from the repo root:
+
+```bash
+node scripts/render.mjs path/to/deck.md          # outputs deck.html
+node scripts/render.mjs deck.md --mode light     # Core Light palette
+node scripts/render.mjs deck.md --mode expressive  # Expressive Dark
+```
+
+One-time setup: `npm install` (installs `@marp-team/marpit` and `markdown-it`).
+
 ## Files
 
 | File | Description |
 |------|-------------|
 | `SKILL.md` | Main skill definition — design system, slide templates, navigation JS, and generation instructions |
+| `references/markdown-authoring.md` | Markdown authoring reference (front-matter, slide-type directives, notes syntax, render invocation) |
+| `references/redhat-brand.md` | Red Hat brand reference — full color palette, typography rules, and design principles |
+| `references/story-arcs.md` | Narrative structure guide — Problem/Tension/Resolution, Myth-Busting, and Journey arcs |
+| `references/rhds-icons.md` | Full inventory of 1,135 Red Hat icons with common name aliases |
+| `themes/red-hat-quick-deck.css` | Marpit theme — slide-type classes, entrance animations, tag pills, media containers |
+| `templates/shell.html`, `shell-js.js`, `logos.mjs` | Output shell: notes panel, controls, navigation JS, inline Red Hat logo SVGs |
+| `scripts/render.mjs` | Node render script — Marpit wrapper with logo injection, notes extraction, and base64 image embedding |
+| `examples/*.md`, `*.html` | Canonical example decks (hello-world, platform-engineering, all-slide-types) with their rendered output |
 | `red-hat-quick-deck.skill` | Packaged skill archive for distribution |
-| `redhat-brand.md` | Red Hat brand reference — full color palette, typography rules, and design principles |
-| `story-arcs.md` | Narrative structure guide — Problem/Tension/Resolution, Myth-Busting, and Journey arcs |
 
 ## Usage
 
