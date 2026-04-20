@@ -9,7 +9,95 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+    /* =========================================================
+       PALETTES — deck-wide palette variables. The render script
+       sets `body.mode-dark | mode-light | mode-expressive` from
+       the front-matter `class:` directive.
+       These live in the shell (not the theme) because Marpit
+       rewrites `:root` into section-scoped selectors that break
+       cascade for deck-level variables.
+       ========================================================= */
+
+    body.mode-dark {
+      color-scheme: dark;
+      --bg-primary: #000000;
+      --bg-secondary: #1f1f1f;
+      --bg-surface: #292929;
+      --text-primary: #ffffff;
+      --text-secondary: #c7c7c7;
+      --text-muted: #a3a3a3;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #f56e6e;
+      --tag-border: #383838;
+      --icon-filter: brightness(0) invert(1);
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+      --glow-opacity: 0.08;
+      --glow-opacity-hero: 0.14;
+      --arch-box-bg: rgba(41, 41, 41, 0.6);
+      --arch-box-border: #383838;
+      --code-bg: rgba(255, 255, 255, 0.06);
+      --code-surface: rgba(255, 255, 255, 0.04);
+      --notes-bg: rgba(20, 20, 20, 0.97);
+      --notes-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+      --hl-teal: transparent;
+      --hl-purple: transparent;
+    }
+
+    body.mode-light {
+      color-scheme: light;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f2f2f2;
+      --bg-surface: #e0e0e0;
+      --text-primary: #151515;
+      --text-secondary: #4d4d4d;
+      --text-muted: #707070;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #a60000;
+      --tag-border: #c7c7c7;
+      --icon-filter: none;
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+      --glow-opacity: 0.04;
+      --glow-opacity-hero: 0.08;
+      --arch-box-bg: rgba(242, 242, 242, 0.8);
+      --arch-box-border: #c7c7c7;
+      --code-bg: rgba(0, 0, 0, 0.05);
+      --code-surface: rgba(0, 0, 0, 0.03);
+      --notes-bg: rgba(250, 250, 250, 0.98);
+      --notes-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
+      --hl-teal: transparent;
+      --hl-purple: transparent;
+    }
+
+    body.mode-expressive {
+      color-scheme: dark;
+      --bg-primary: #1b0d33;
+      --bg-secondary: #000000;
+      --bg-surface: #21134d;
+      --text-primary: #ffffff;
+      --text-secondary: #d0c5f4;
+      --text-muted: #b6a6e9;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #f56e6e;
+      --tag-border: #3d2785;
+      --icon-filter: brightness(0) invert(1);
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+      --glow-opacity: 0.10;
+      --glow-opacity-hero: 0.16;
+      --arch-box-bg: rgba(33, 19, 77, 0.8);
+      --arch-box-border: #3d2785;
+      --code-bg: rgba(255, 255, 255, 0.08);
+      --code-surface: rgba(255, 255, 255, 0.04);
+      --notes-bg: rgba(27, 13, 51, 0.97);
+      --notes-shadow: -8px 0 24px rgba(0, 0, 0, 0.6);
+      --hl-teal: #37a3a3;
+      --hl-purple: #876fd4;
+    }
+
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    body { background: var(--bg-primary, #000); }
 
     /* Marpit-generated CSS (includes Marpit reset + scoped rhqd theme) */
     {{MARPIT_CSS}}
@@ -41,7 +129,7 @@
       right: -420px;
       width: 400px;
       height: 100vh;
-      background: rgba(20, 20, 20, 0.97);
+      background: var(--notes-bg, rgba(20, 20, 20, 0.97));
       border-left: 2px solid var(--accent, #ee0000);
       padding: var(--rh-space-2xl, 48px) var(--rh-space-xl, 32px);
       overflow-y: auto;
@@ -51,7 +139,7 @@
       font-size: var(--rh-font-size-body-text-md, 1rem);
       color: var(--text-secondary, #c7c7c7);
       line-height: 1.6;
-      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--notes-shadow, -8px 0 24px rgba(0, 0, 0, 0.5));
       box-sizing: border-box;
     }
     .notes-panel.visible { right: 0; }
@@ -69,7 +157,7 @@
 
   </style>
 </head>
-<body>
+<body class="{{BODY_CLASS}}">
   {{SLIDES_HTML}}
 
   <div class="notes-panel" aria-hidden="true">

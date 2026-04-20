@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Phase 0 Spike — Marpit Pipeline Works</title>
+  <title>Every Slide Type — A Phase 2 Showcase</title>
   <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -792,49 +792,157 @@ div.marpit > section.active > *:nth-child(6) { animation-delay: 0.5s; }
   </style>
 </head>
 <body class="mode-dark">
-  <div class="marpit"><section id="1" data-class="title" data-theme="rhqd" class="title" style="--class:title;--theme:rhqd;" data-notes="&lt;p&gt;This is the Phase 0 validation deck. Three slides prove:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Marpit renders markdown to &lt;code&gt;&amp;lt;section&amp;gt;&lt;/code&gt; elements&lt;/li&gt;
-&lt;li&gt;Theme CSS loads and palette applies&lt;/li&gt;
-&lt;li&gt;HTML-comment notes are extracted and injected as &lt;code&gt;data-notes&lt;/code&gt; attributes&lt;/li&gt;
-&lt;li&gt;The shell's 'N' key toggle reads those attributes correctly&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;If you can read this note after pressing &lt;strong&gt;N&lt;/strong&gt;, the notes pipeline works.&lt;/p&gt;
-"><div class="breadcrumb"><svg class="rh-logo small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat"><title>Red Hat</title><path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/><path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/></svg>› PHASE 0 · SPIKE</div>
-<div class="slide-label">—— MARP INCLUSION · APR 20, 2026</div>
-<h1>Phase 0 Spike: <em>Marpit</em> Pipeline Works</h1>
-<p>Proving the render architecture end-to-end before committing to full theme parity.</p>
-<div class="tags">
-  <span class="tag">Marpit</span>
-  <span class="tag">Core Dark</span>
-  <span class="tag accent">Spike</span>
-</div>
-<div class="attribution">Phase 0 · Architecture Validation</div>
-</section>
-<section id="2" data-class="content" data-theme="rhqd" class="content" style="--class:content;--theme:rhqd;" data-notes="&lt;p&gt;References:&lt;/p&gt;
+  <div class="marpit"><section id="1" data-class="title" data-theme="rhqd" class="title" style="--class:title;--theme:rhqd;" data-notes="&lt;p&gt;This deck covers every supported slide type in the MARP-based pipeline.
+Use it as a visual reference when choosing a layout for your own content.&lt;/p&gt;
+&lt;p&gt;Viewer tips:&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;Marpit API docs: &lt;a href=&quot;https://marpit.marp.app/&quot;&gt;https://marpit.marp.app/&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Render script: scripts/render.mjs&lt;/li&gt;
-&lt;li&gt;Theme: themes/red-hat-quick-deck.css&lt;/li&gt;
+&lt;li&gt;Arrow keys or click to navigate&lt;/li&gt;
+&lt;li&gt;Press 'N' to toggle these contextual notes&lt;/li&gt;
+&lt;li&gt;Share the .html file directly, or edit the .md and re-render&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;[VIDEO OPPORTUNITY] A 20-second clip showing an author editing this
-markdown, rerunning the render script, and seeing the HTML update would
-sell the &amp;quot;easy post-edit&amp;quot; value prop cleanly.&lt;/p&gt;
-"><div class="slide-label">—— PROOF POINTS</div>
-<h2>What the <em>Spike</em> Validates</h2>
-<ul>
-<li>Marpit <code>render()</code> returns the expected <code>{html, css, comments}</code> triple</li>
-<li>Custom theme CSS compiles without a CSS reset fight</li>
-<li><code>&lt;!-- notes: --&gt;</code> extraction is working per-slide</li>
-<li>Navigation JS queries <code>section</code> selectors correctly</li>
-<li>The ambient red glow renders on every slide</li>
-</ul>
-<div class="source">Later phases expand palettes, slide types, and media handling.</div>
+&lt;p&gt;[IMAGE OPPORTUNITY] Nano Banana prompt: &amp;quot;abstract red cosmic nebula
+with glowing filaments, cinematic, pure black background, 16:9, no text&amp;quot;&lt;/p&gt;
+"><div class="breadcrumb"><svg class="rh-logo small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat"><title>Red Hat</title><path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/><path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/></svg>› PHASE 2 · VISUAL SHOWCASE</div>
+<div class="slide-label">—— EVERY SLIDE TYPE · APR 20, 2026</div>
+<h1>Every Slide Type, <em>One Deck</em></h1>
+<p>Comparison, architecture, video, media, stat, quote, CTA — all cinematic, all brand-safe.</p>
+<div class="tags">
+  <span class="tag">Core Dark</span>
+  <span class="tag">Phase 2</span>
+  <span class="tag accent">Showcase</span>
+</div>
+<div class="attribution">Red Hat Quick Deck · MARP Integration</div>
 </section>
-<section id="3" data-class="thankyou" data-theme="rhqd" class="thankyou" style="--class:thankyou;--theme:rhqd;" data-notes="&lt;p&gt;Next: Phase 1 — full Core Dark feature parity for simple decks.&lt;/p&gt;
+<section id="2" data-class="content" data-theme="rhqd" class="content" style="--class:content;--theme:rhqd;" data-notes="&lt;p&gt;Content slides are the workhorse. Use them for most of your deck —
+analysis, observations, arguments. Keep bullets to 3-5 items; prefer
+full sentences to fragments.&lt;/p&gt;
+&lt;p&gt;[VIDEO OPPORTUNITY] A B-roll of a dev workstation here could warm up
+the section.&lt;/p&gt;
+"><div class="slide-label">—— CONTENT</div>
+<h2>Assertions, <em>Not</em> Labels</h2>
+<p>Write every headline as a claim. The headline alone should carry the slide.</p>
+<ul>
+<li><strong>Body text uses Red Hat Text</strong> — readable at projector distances.</li>
+<li><strong>Bold marks the hinge word</strong> — scanning readers catch the meaning.</li>
+<li><strong>Inline code like <code>kubectl apply -f</code></strong> gets a subtle surface + mono font.</li>
+<li><strong>Bullets are rare by design</strong> — prose reads better than fragments.</li>
+</ul>
+<div class="source">Principle: one idea per slide; the headline carries it.</div>
+</section>
+<section id="3" data-class="comparison" data-theme="rhqd" class="comparison" style="--class:comparison;--theme:rhqd;" data-notes="&lt;p&gt;The comparison slide works best when the two columns have the same
+number of points. The &lt;code&gt;preferred&lt;/code&gt; class on a column adds the red
+border and heading color to mark the recommended side.&lt;/p&gt;
+"><div class="slide-label">—— COMPARISON</div>
+<h2>The <em>Old Way</em> vs. The <em>Paved Road</em></h2>
+<div class="compare">
+  <div class="compare-col">
+    <h3>Without a platform</h3>
+    <ul>
+      <li>Tickets queue for days before first deploy</li>
+      <li>Every team reinvents CI scaffolding</li>
+      <li>Secrets handling is "ask the SRE"</li>
+      <li>No shared SLOs — everyone improvises</li>
+    </ul>
+  </div>
+  <div class="compare-vs">VS</div>
+  <div class="compare-col preferred">
+    <h3>With a paved road</h3>
+    <ul>
+      <li>First deploy in under 15 minutes</li>
+      <li>CI and observability are templated</li>
+      <li>Secrets flow through blessed primitives</li>
+      <li>Platform SLOs are published and enforced</li>
+    </ul>
+  </div>
+</div>
+</section>
+<section id="4" data-class="architecture" data-theme="rhqd" class="architecture" style="--class:architecture;--theme:rhqd;" data-notes="&lt;p&gt;Architecture slides use the &lt;code&gt;.arch-flow&lt;/code&gt; container with &lt;code&gt;.arch-box&lt;/code&gt;
+children and optional &lt;code&gt;.arch-arrow&lt;/code&gt; separators. Add &lt;code&gt;.highlight&lt;/code&gt; to
+the key innovation box for a red border and subtle red tint.&lt;/p&gt;
+"><div class="slide-label">—— ARCHITECTURE</div>
+<h2>A <em>Three-Layer</em> Platform</h2>
+<div class="arch-flow">
+  <div class="arch-box">
+    <h3>Developer Portal</h3>
+    <p>Self-service catalog of runtime templates, observability, and deploy targets.</p>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box highlight">
+    <h3>Golden Paths</h3>
+    <p>Opinionated templates with CI, SBOM, and blessed secrets baked in.</p>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">
+    <h3>Platform Runtime</h3>
+    <p>Kubernetes, Argo, Kyverno — the shared substrate every team targets.</p>
+  </div>
+</div>
+<div class="source">The middle layer is the platform. Everything else is infrastructure.</div>
+</section>
+<section id="5" data-class="stat" data-theme="rhqd" class="stat" style="--class:stat;--theme:rhqd;" data-notes="&lt;p&gt;Big-number slides work best with stats where the magnitude itself is
+the story. Use the &lt;code&gt;&amp;lt;span class=&amp;quot;big-number&amp;quot;&amp;gt;&lt;/code&gt; wrapper inside the
+&lt;code&gt;#&lt;/code&gt; heading so the 100px red number renders correctly.&lt;/p&gt;
+"><div class="slide-label">—— IMPACT</div>
+<h1><span class="big-number">15×</span></h1>
+<p>faster onboarding to first production deploy — paved roads measured <em>end-to-end</em> from <code>git init</code> to traffic.</p>
+<div class="source">Internal benchmark · Red Hat Platform Engineering 2026</div>
+</section>
+<section id="6" data-class="video" data-theme="rhqd" class="video" style="--class:video;--theme:rhqd;" data-notes="&lt;p&gt;Video slides use a raw HTML block with &lt;code&gt;.video-container&lt;/code&gt; and a
+&lt;code&gt;data-video-id&lt;/code&gt; attribute set to the YouTube ID. The shell JS detects
+protocol: HTTP/HTTPS embeds the iframe inline; file:// opens YouTube
+in a new tab (browsers block iframe embeds from file://).&lt;/p&gt;
+&lt;p&gt;Tell the viewer: inline video requires serving the HTML over HTTP,
+e.g. &lt;code&gt;python3 -m http.server&lt;/code&gt;.&lt;/p&gt;
+"><div class="slide-label">—— DEMO</div>
+<h2>See It <em>Live</em></h2>
+<div class="video-container" data-video-id="dQw4w9WgXcQ">
+  <img class="video-thumbnail" src="https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg" alt="Demo video thumbnail">
+  <div class="video-play-btn"></div>
+</div>
+<div class="media-caption">Click play — on HTTP inline; on file:// opens in a new tab.</div>
+</section>
+<section id="7" data-class="media" data-theme="rhqd" class="media" style="--class:media;--theme:rhqd;" data-notes="&lt;p&gt;Media slides support images, memes, and animated GIFs. Use
+&lt;code&gt;.media-container&lt;/code&gt; wrapping an &lt;code&gt;&amp;lt;img&amp;gt;&lt;/code&gt; with &lt;code&gt;.slide-media&lt;/code&gt;. For local
+files, the render script will base64-encode them into the HTML
+automatically — just reference the path.&lt;/p&gt;
+&lt;p&gt;Imgflip, Giphy, and direct image URLs all work. The render script
+leaves remote URLs alone and only embeds local files.&lt;/p&gt;
+"><div class="slide-label">—— REACTION</div>
+<h2>When the <em>First</em> Paved Road Ships</h2>
+<div class="media-container">
+  <img class="slide-media" src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" alt="Celebration reaction GIF">
+</div>
+<div class="media-caption">A well-placed meme breaks tension and signals emotional rhythm.</div>
+</section>
+<section id="8" data-class="quote" data-theme="rhqd" class="quote" style="--class:quote;--theme:rhqd;" data-notes="&lt;p&gt;Quote slides render a markdown blockquote with a decorative red
+opening quote mark via &lt;code&gt;::before&lt;/code&gt;. Attribute below with
+&lt;code&gt;&amp;lt;div class=&amp;quot;attribution&amp;quot;&amp;gt;&lt;/code&gt;. Keep the quote short enough to read at
+projector distance — under 30 words is ideal.&lt;/p&gt;
+"><div class="slide-label">—— PRINCIPLE</div>
+<blockquote>
+<p>Tools are necessary but <em>not sufficient</em>. A platform is what emerges from the combination of components, contracts, and on-call commitment.</p>
+</blockquote>
+<div class="attribution">— Working-group summary, Red Hat Platform Eng, 2026</div>
+</section>
+<section id="9" data-class="cta" data-theme="rhqd" class="cta" style="--class:cta;--theme:rhqd;" data-notes="&lt;p&gt;CTA slides cap the narrative with concrete actions. Three time-boxed
+commitments tends to work well. Use &lt;code&gt;_italic_&lt;/code&gt; in the headline for a
+red-accent emphasis on the hinge word.&lt;/p&gt;
+"><div class="slide-label">—— NEXT STEPS</div>
+<h1>Pick <em>One</em> Golden Path</h1>
+<p>Commit to productionizing a single service archetype end-to-end before you scale.</p>
+<ul>
+<li><strong>This week</strong> — identify the three most-shipped service shapes</li>
+<li><strong>This month</strong> — ship a working template + CI + deploy pipeline</li>
+<li><strong>This quarter</strong> — retire the ticket queue for that shape</li>
+</ul>
+<div class="source">Platform maturity is a sequence of small, boring wins.</div>
+</section>
+<section id="10" data-class="thankyou" data-theme="rhqd" class="thankyou" style="--class:thankyou;--theme:rhqd;" data-notes="&lt;p&gt;The thankyou slide auto-injects the large Red Hat logo at the bottom
+via the render script. Don't embed the SVG manually.&lt;/p&gt;
 ">
-<h1>Spike <em>Complete</em></h1>
-<p>If you can see this slide, the architecture is viable.</p>
+<h1>Thank <em>You</em></h1>
+<p>Questions, corrections, and war stories welcome.</p>
+<div class="attribution">Red Hat Quick Deck · Phase 2 Showcase</div>
 
 <div class="logo-footer"><svg class="rh-logo large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat"><title>Red Hat</title><path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/><path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/></svg></div>
 </section>

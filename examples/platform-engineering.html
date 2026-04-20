@@ -9,7 +9,95 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+    /* =========================================================
+       PALETTES — deck-wide palette variables. The render script
+       sets `body.mode-dark | mode-light | mode-expressive` from
+       the front-matter `class:` directive.
+       These live in the shell (not the theme) because Marpit
+       rewrites `:root` into section-scoped selectors that break
+       cascade for deck-level variables.
+       ========================================================= */
+
+    body.mode-dark {
+      color-scheme: dark;
+      --bg-primary: #000000;
+      --bg-secondary: #1f1f1f;
+      --bg-surface: #292929;
+      --text-primary: #ffffff;
+      --text-secondary: #c7c7c7;
+      --text-muted: #a3a3a3;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #f56e6e;
+      --tag-border: #383838;
+      --icon-filter: brightness(0) invert(1);
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+      --glow-opacity: 0.08;
+      --glow-opacity-hero: 0.14;
+      --arch-box-bg: rgba(41, 41, 41, 0.6);
+      --arch-box-border: #383838;
+      --code-bg: rgba(255, 255, 255, 0.06);
+      --code-surface: rgba(255, 255, 255, 0.04);
+      --notes-bg: rgba(20, 20, 20, 0.97);
+      --notes-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+      --hl-teal: transparent;
+      --hl-purple: transparent;
+    }
+
+    body.mode-light {
+      color-scheme: light;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f2f2f2;
+      --bg-surface: #e0e0e0;
+      --text-primary: #151515;
+      --text-secondary: #4d4d4d;
+      --text-muted: #707070;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #a60000;
+      --tag-border: #c7c7c7;
+      --icon-filter: none;
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+      --glow-opacity: 0.04;
+      --glow-opacity-hero: 0.08;
+      --arch-box-bg: rgba(242, 242, 242, 0.8);
+      --arch-box-border: #c7c7c7;
+      --code-bg: rgba(0, 0, 0, 0.05);
+      --code-surface: rgba(0, 0, 0, 0.03);
+      --notes-bg: rgba(250, 250, 250, 0.98);
+      --notes-shadow: -8px 0 24px rgba(0, 0, 0, 0.18);
+      --hl-teal: transparent;
+      --hl-purple: transparent;
+    }
+
+    body.mode-expressive {
+      color-scheme: dark;
+      --bg-primary: #1b0d33;
+      --bg-secondary: #000000;
+      --bg-surface: #21134d;
+      --text-primary: #ffffff;
+      --text-secondary: #d0c5f4;
+      --text-muted: #b6a6e9;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #f56e6e;
+      --tag-border: #3d2785;
+      --icon-filter: brightness(0) invert(1);
+      --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+      --glow-opacity: 0.10;
+      --glow-opacity-hero: 0.16;
+      --arch-box-bg: rgba(33, 19, 77, 0.8);
+      --arch-box-border: #3d2785;
+      --code-bg: rgba(255, 255, 255, 0.08);
+      --code-surface: rgba(255, 255, 255, 0.04);
+      --notes-bg: rgba(27, 13, 51, 0.97);
+      --notes-shadow: -8px 0 24px rgba(0, 0, 0, 0.6);
+      --hl-teal: #37a3a3;
+      --hl-purple: #876fd4;
+    }
+
+    html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+    body { background: var(--bg-primary, #000); }
 
     /* Marpit-generated CSS (includes Marpit reset + scoped rhqd theme) */
     div.marpit > section {
@@ -103,27 +191,13 @@ div.marpit > section * { box-sizing: border-box; }
 div.marpit > section:not(.active) { display: none; }
 
 /* ============================================================
-   CORE DARK PALETTE (Phase 0 default)
-   ============================================================ */
-
-div.marpit > :where(section):not([\20 root]) {
-  color-scheme: dark;
-  --bg-primary: #000000;
-  --bg-secondary: #1f1f1f;
-  --bg-surface: #292929;
-  --text-primary: #ffffff;
-  --text-secondary: #c7c7c7;
-  --text-muted: #a3a3a3;
-  --accent: #ee0000;
-  --accent-dark: #a60000;
-  --accent-light: #f56e6e;
-  --tag-border: #383838;
-  --icon-filter: brightness(0) invert(1);
-  --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
-}
-
-/* ============================================================
    AMBIENT GLOW
+   ----------------------------------------------------------------
+   Palette variables (including --glow-opacity) live in the shell
+   template (`templates/shell.html`), scoped to `body.mode-dark`,
+   `body.mode-light`, and `body.mode-expressive`. Marpit rewrites
+   `:root` in its themes, so palette definitions must live outside
+   the theme to cascade correctly.
    ============================================================ */
 
 div.marpit > section::before {
@@ -133,14 +207,14 @@ div.marpit > section::before {
   right: -10%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(238, 0, 0, var(--glow-opacity, 0.08)) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
 div.marpit > section.title::before,
 div.marpit > section.thankyou::before {
-  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.14) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(238, 0, 0, var(--glow-opacity-hero, 0.14)) 0%, transparent 70%);
 }
 
 div.marpit > section > * { position: relative; z-index: 1; }
@@ -392,6 +466,240 @@ div.marpit > section.cta { text-align: left; }
 div.marpit > section.cta h1 { font-size: var(--rh-font-size-heading-xl, 2.5rem); }
 div.marpit > section.cta h1 em { color: var(--accent); font-style: italic; }
 
+/* ============================================================
+   COMPARISON SLIDE — two-column layout
+   ============================================================ */
+
+div.marpit > section.comparison h2 { margin-bottom: var(--rh-space-xl, 32px); }
+div.marpit > section.comparison h2 em { color: var(--accent); font-style: italic; }
+
+div.marpit > section.comparison .compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--rh-space-lg, 24px);
+  align-items: stretch;
+  margin-top: var(--rh-space-lg, 24px);
+}
+
+div.marpit > section.comparison .compare > .compare-col {
+  background: var(--arch-box-bg, rgba(41, 41, 41, 0.6));
+  border: 1px solid var(--arch-box-border, #383838);
+  border-radius: var(--rh-border-radius-default, 3px);
+  padding: var(--rh-space-xl, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rh-space-md, 16px);
+}
+
+div.marpit > section.comparison .compare > .compare-col.preferred {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+div.marpit > section.comparison .compare-col h3 {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: var(--rh-font-size-heading-sm, 1.25rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--rh-space-sm, 8px) 0;
+}
+
+div.marpit > section.comparison .compare-col.preferred h3 { color: var(--accent); }
+
+div.marpit > section.comparison .compare-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: var(--rh-font-size-body-text-md, 1rem);
+}
+div.marpit > section.comparison .compare-col li { margin-bottom: var(--rh-space-sm, 8px); }
+div.marpit > section.comparison .compare-col li::before {
+  content: '›';
+  color: var(--accent);
+  margin-right: var(--rh-space-sm, 8px);
+  font-weight: 700;
+}
+
+div.marpit > section.comparison .compare > .compare-vs {
+  align-self: center;
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+div.marpit > section.comparison .compare > div.marpit > section section.compare-vs {
+  --marpit-root-font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+}
+
+/* ============================================================
+   ARCHITECTURE SLIDE — box diagrams with optional arrows
+   ============================================================ */
+
+div.marpit > section.architecture h2 { margin-bottom: var(--rh-space-xl, 32px); }
+div.marpit > section.architecture h2 em { color: var(--accent); font-style: italic; }
+
+div.marpit > section.architecture .arch-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rh-space-md, 16px);
+  align-items: stretch;
+  justify-content: center;
+  margin-top: var(--rh-space-lg, 24px);
+}
+
+div.marpit > section.architecture .arch-box {
+  flex: 1 1 200px;
+  max-width: 280px;
+  background: var(--arch-box-bg, rgba(41, 41, 41, 0.6));
+  border: 1px solid var(--arch-box-border, #383838);
+  border-radius: var(--rh-border-radius-default, 3px);
+  padding: var(--rh-space-lg, 24px);
+  box-shadow: var(--rh-box-shadow-md, 0 4px 6px 1px rgba(21, 21, 21, 0.25));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rh-space-sm, 8px);
+  text-align: left;
+}
+
+div.marpit > section.architecture .arch-box.highlight {
+  border-color: var(--accent);
+  border-width: 2px;
+  background: rgba(238, 0, 0, 0.05);
+}
+
+div.marpit > section.architecture .arch-box h3 {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: var(--rh-font-size-heading-sm, 1.25rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+div.marpit > section.architecture .arch-box p {
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+div.marpit > section.architecture .arch-arrow {
+  align-self: center;
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: calc(var(--marpit-root-font-size, 1rem) * 2);
+  color: var(--accent);
+  line-height: 1;
+  padding: 0 var(--rh-space-sm, 8px);
+}
+
+div.marpit > section.architecture div.marpit > section section.arch-arrow {
+  --marpit-root-font-size: calc(var(--marpit-root-font-size, 1rem) * 2);
+}
+
+/* ============================================================
+   VIDEO SLIDE
+   ============================================================ */
+
+div.marpit > section.video h2 { margin-bottom: var(--rh-space-xl, 32px); }
+div.marpit > section.video h2 em { color: var(--accent); font-style: italic; }
+
+div.marpit > section.video .video-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--rh-border-radius-default, 3px);
+  overflow: hidden;
+  box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+  background: var(--bg-secondary);
+  align-self: center;
+  cursor: pointer;
+}
+div.marpit > section.video .video-container iframe,
+div.marpit > section.video .video-container video {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+div.marpit > section.video .video-thumbnail {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+div.marpit > section.video .video-play-btn {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: rgba(238, 0, 0, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s ease;
+}
+div.marpit > section.video .video-play-btn::after {
+  content: '';
+  display: block;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 14px 0 14px 24px;
+  border-color: transparent transparent transparent #fff;
+  margin-left: 4px;
+}
+div.marpit > section.video .video-container:hover .video-play-btn { background: rgba(238, 0, 0, 1); }
+
+/* ============================================================
+   MEDIA SLIDE — memes, GIFs, images
+   ============================================================ */
+
+div.marpit > section.media h2 { margin-bottom: var(--rh-space-xl, 32px); }
+div.marpit > section.media h2 em { color: var(--accent); font-style: italic; }
+
+div.marpit > section.media .media-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  max-height: 65vh;
+  padding: var(--rh-space-md, 16px) 0;
+  align-self: center;
+}
+
+div.marpit > section.media .slide-media {
+  display: block;
+  max-width: 90%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--rh-border-radius-default, 3px);
+  box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+}
+
+div.marpit > section .media-caption {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: var(--rh-space-md, 16px);
+  max-width: 720px;
+  align-self: center;
+}
+
+div.marpit > section section.media-caption {
+  --marpit-root-font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+}
+
 div.marpit > section.thankyou {
   align-items: center;
   text-align: center;
@@ -455,7 +763,7 @@ div.marpit > section.active > *:nth-child(6) { animation-delay: 0.5s; }
       right: -420px;
       width: 400px;
       height: 100vh;
-      background: rgba(20, 20, 20, 0.97);
+      background: var(--notes-bg, rgba(20, 20, 20, 0.97));
       border-left: 2px solid var(--accent, #ee0000);
       padding: var(--rh-space-2xl, 48px) var(--rh-space-xl, 32px);
       overflow-y: auto;
@@ -465,7 +773,7 @@ div.marpit > section.active > *:nth-child(6) { animation-delay: 0.5s; }
       font-size: var(--rh-font-size-body-text-md, 1rem);
       color: var(--text-secondary, #c7c7c7);
       line-height: 1.6;
-      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--notes-shadow, -8px 0 24px rgba(0, 0, 0, 0.5));
       box-sizing: border-box;
     }
     .notes-panel.visible { right: 0; }
@@ -483,7 +791,7 @@ div.marpit > section.active > *:nth-child(6) { animation-delay: 0.5s; }
 
   </style>
 </head>
-<body>
+<body class="mode-dark">
   <div class="marpit"><section id="1" data-class="title" data-theme="rhqd" class="title" style="--class:title;--theme:rhqd;" data-notes="&lt;p&gt;References:&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;&lt;a href=&quot;https://www.cncf.io/reports/state-of-platform-engineering-2025/&quot;&gt;CNCF State of Platform Engineering 2025&lt;/a&gt;&lt;/li&gt;
@@ -723,6 +1031,16 @@ with &lt;code&gt;node scripts/render.mjs examples/platform-engineering.md&lt;/co
   const initial = urlMatch ? Math.max(0, Math.min(slides.length - 1, parseInt(urlMatch, 10) - 1)) : 0;
   idx = initial;
   show(idx);
+
+  // Honor ?notes=1 for auto-opening the notes panel (screenshot verification).
+  if (/[?&]notes=1\b/.test(location.search)) {
+    notesVisible = true;
+    if (notesPanel) {
+      notesPanel.classList.add('visible');
+      notesPanel.setAttribute('aria-hidden', 'false');
+    }
+    updateNotesContent();
+  }
 })();
 
   </script>

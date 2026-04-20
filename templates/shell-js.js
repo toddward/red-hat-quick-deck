@@ -104,4 +104,14 @@
   const initial = urlMatch ? Math.max(0, Math.min(slides.length - 1, parseInt(urlMatch, 10) - 1)) : 0;
   idx = initial;
   show(idx);
+
+  // Honor ?notes=1 for auto-opening the notes panel (screenshot verification).
+  if (/[?&]notes=1\b/.test(location.search)) {
+    notesVisible = true;
+    if (notesPanel) {
+      notesPanel.classList.add('visible');
+      notesPanel.setAttribute('aria-hidden', 'false');
+    }
+    updateNotesContent();
+  }
 })();

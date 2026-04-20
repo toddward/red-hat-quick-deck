@@ -133,6 +133,61 @@ function substitute(template, map) {
   });
 }
 
+const IMG_MIME = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+};
+
+/**
+ * Walk the rendered HTML, find <img src="..."> entries that point at local
+ * files (relative paths or file:// URLs), read them, and replace the src
+ * with a base64 data URI. Keeps the final HTML portable and self-contained.
+ *
+ * Skips: http/https URLs, data: URIs, and paths that can't be resolved.
+ * Warns (but doesn't fail) if a referenced file is missing.
+ */
+async function embedLocalImages(html, baseDir) {
+  const matches = [...html.matchAll(/<img\s+[^>]*src="([^"]+)"/g)];
+  const replacements = new Map();
+
+  for (const [, src] of matches) {
+    if (replacements.has(src)) continue;
+    if (/^(https?:|data:)/i.test(src)) continue;
+
+    let path;
+    if (src.startsWith('file://')) {
+      path = fileURLToPath(src);
+    } else if (src.startsWith('/')) {
+      path = src;
+    } else {
+      path = resolve(baseDir, src);
+    }
+
+    const ext = (path.split('.').pop() || '').toLowerCase();
+    const mime = IMG_MIME[ext];
+    if (!mime) continue;
+
+    try {
+      const data = await readFile(path);
+      const uri = `data:${mime};base64,${data.toString('base64')}`;
+      replacements.set(src, uri);
+    } catch {
+      console.warn(`  ! Skipping missing image: ${src}`);
+    }
+  }
+
+  if (replacements.size === 0) return html;
+
+  return html.replace(/(<img\s+[^>]*src=")([^"]+)(")/g, (full, pre, src, post) => {
+    const uri = replacements.get(src);
+    return uri ? `${pre}${uri}${post}` : full;
+  });
+}
+
 async function main() {
   const args = parseCliArgs();
 
@@ -167,10 +222,13 @@ async function main() {
   const titleMatch = markdown.match(/^title:\s*(.+)$/m);
   const deckTitle = titleMatch ? titleMatch[1].trim().replace(/^['"]|['"]$/g, '') : 'Red Hat Quick Deck';
 
+  const slidesWithImages = await embedLocalImages(slidesWithNotes, dirname(args.input));
+
   const composed = substitute(shellHtml, {
     TITLE: escapeHtmlAttr(deckTitle),
+    BODY_CLASS: `mode-${mode}`,
     MARPIT_CSS: marpitCss,
-    SLIDES_HTML: slidesWithNotes,
+    SLIDES_HTML: slidesWithImages,
     SHELL_JS: shellJs,
   });
 

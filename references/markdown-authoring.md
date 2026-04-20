@@ -216,9 +216,124 @@ Questions, corrections, and war stories welcome.
 <div class="attribution">Red Hat · Platform Engineering · Quick Deck</div>
 ```
 
-### 7–10. Comparison / Architecture / Video / Media
+### 7. Comparison (two-column)
 
-These land in Phase 2 — see `examples/` for updated patterns once available.
+Use `<div class="compare">` with two `<div class="compare-col">` children and
+an optional middle `<div class="compare-vs">` separator. Add `.preferred` to
+the recommended column for the red border + red heading.
+
+```markdown
+<!-- _class: comparison -->
+
+<div class="slide-label">—— COMPARISON</div>
+
+## The _Old Way_ vs. The _New Way_
+
+<div class="compare">
+  <div class="compare-col">
+    <h3>Without a platform</h3>
+    <ul>
+      <li>Tickets queue for days</li>
+      <li>Every team reinvents CI</li>
+    </ul>
+  </div>
+  <div class="compare-vs">VS</div>
+  <div class="compare-col preferred">
+    <h3>With a paved road</h3>
+    <ul>
+      <li>First deploy in 15 minutes</li>
+      <li>CI and observability templated</li>
+    </ul>
+  </div>
+</div>
+```
+
+### 8. Architecture / Diagram
+
+Use `<div class="arch-flow">` wrapping `<div class="arch-box">` components
+with optional `<div class="arch-arrow">→</div>` separators. Add `.highlight`
+to the key innovation box.
+
+```markdown
+<!-- _class: architecture -->
+
+## A _Three-Layer_ Platform
+
+<div class="arch-flow">
+  <div class="arch-box">
+    <h3>Developer Portal</h3>
+    <p>Self-service catalog of templates.</p>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box highlight">
+    <h3>Golden Paths</h3>
+    <p>Opinionated templates with CI baked in.</p>
+  </div>
+  <div class="arch-arrow">→</div>
+  <div class="arch-box">
+    <h3>Platform Runtime</h3>
+    <p>The shared substrate teams target.</p>
+  </div>
+</div>
+```
+
+Arrows render in red. Boxes use subtle surface color with a dark border;
+the `.highlight` class adds the red border and a faint red background.
+
+### 9. Video
+
+YouTube / Vimeo / direct MP4. Use `.video-container` with `data-video-id`
+for YouTube. The shell's JS handles the click: HTTP/HTTPS embeds the
+iframe inline; `file://` opens YouTube in a new tab.
+
+```markdown
+<!-- _class: video -->
+
+<div class="slide-label">—— DEMO</div>
+
+## See It _Live_
+
+<div class="video-container" data-video-id="VIDEO_ID">
+  <img class="video-thumbnail" src="https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg" alt="Demo">
+  <div class="video-play-btn"></div>
+</div>
+
+<div class="media-caption">Click play — inline on HTTP, new tab on file://.</div>
+```
+
+**Required reminder to the user**: tell them inline playback requires
+serving via HTTP (`python3 -m http.server`). On `file://`, clicking the
+thumbnail opens YouTube in a new tab.
+
+URL conversion rules (apply when the user provides a URL):
+- `https://www.youtube.com/watch?v=ID` → use `ID` in `data-video-id`
+- `https://youtu.be/ID` → same
+- `https://vimeo.com/ID` → adapt the embed URL pattern
+- Direct `.mp4/.webm/.ogg` → use `<video controls muted>` in place of the
+  thumbnail + play button
+
+### 10. Media (memes, GIFs, images, Giphy)
+
+```markdown
+<!-- _class: media -->
+
+<div class="slide-label">—— REACTION</div>
+
+## When the _First_ Ship Lands
+
+<div class="media-container">
+  <img class="slide-media" src="https://media.giphy.com/media/ID/giphy.gif" alt="Reaction GIF">
+</div>
+
+<div class="media-caption">A well-placed meme breaks tension.</div>
+```
+
+URL conversion rules:
+- Giphy `https://giphy.com/gifs/SLUG-ID` → `https://media.giphy.com/media/ID/giphy.gif`
+- Imgflip templates → `https://imgflip.com/s/meme/Template-Name.jpg` (full size)
+- Local files (`@file`, relative paths, `/absolute/path`, or `file://`) →
+  the render script base64-encodes them automatically. Just reference the
+  path in the `src` attribute. Supported: `.png .jpg .jpeg .gif .webp .svg`.
 
 ## Rendering
 

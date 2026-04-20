@@ -33,27 +33,13 @@ section * { box-sizing: border-box; }
 section:not(.active) { display: none; }
 
 /* ============================================================
-   CORE DARK PALETTE (Phase 0 default)
-   ============================================================ */
-
-:root {
-  color-scheme: dark;
-  --bg-primary: #000000;
-  --bg-secondary: #1f1f1f;
-  --bg-surface: #292929;
-  --text-primary: #ffffff;
-  --text-secondary: #c7c7c7;
-  --text-muted: #a3a3a3;
-  --accent: #ee0000;
-  --accent-dark: #a60000;
-  --accent-light: #f56e6e;
-  --tag-border: #383838;
-  --icon-filter: brightness(0) invert(1);
-  --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
-}
-
-/* ============================================================
    AMBIENT GLOW
+   ----------------------------------------------------------------
+   Palette variables (including --glow-opacity) live in the shell
+   template (`templates/shell.html`), scoped to `body.mode-dark`,
+   `body.mode-light`, and `body.mode-expressive`. Marpit rewrites
+   `:root` in its themes, so palette definitions must live outside
+   the theme to cascade correctly.
    ============================================================ */
 
 section::before {
@@ -63,14 +49,14 @@ section::before {
   right: -10%;
   width: 60%;
   height: 60%;
-  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.08) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(238, 0, 0, var(--glow-opacity, 0.08)) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
 
 section.title::before,
 section.thankyou::before {
-  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.14) 0%, transparent 70%);
+  background: radial-gradient(ellipse, rgba(238, 0, 0, var(--glow-opacity-hero, 0.14)) 0%, transparent 70%);
 }
 
 section > * { position: relative; z-index: 1; }
@@ -298,6 +284,228 @@ section.quote blockquote::before {
 section.cta { text-align: left; }
 section.cta h1 { font-size: var(--rh-font-size-heading-xl, 2.5rem); }
 section.cta h1 em { color: var(--accent); font-style: italic; }
+
+/* ============================================================
+   COMPARISON SLIDE — two-column layout
+   ============================================================ */
+
+section.comparison h2 { margin-bottom: var(--rh-space-xl, 32px); }
+section.comparison h2 em { color: var(--accent); font-style: italic; }
+
+section.comparison .compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--rh-space-lg, 24px);
+  align-items: stretch;
+  margin-top: var(--rh-space-lg, 24px);
+}
+
+section.comparison .compare > .compare-col {
+  background: var(--arch-box-bg, rgba(41, 41, 41, 0.6));
+  border: 1px solid var(--arch-box-border, #383838);
+  border-radius: var(--rh-border-radius-default, 3px);
+  padding: var(--rh-space-xl, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: var(--rh-space-md, 16px);
+}
+
+section.comparison .compare > .compare-col.preferred {
+  border-color: var(--accent);
+  border-width: 2px;
+}
+
+section.comparison .compare-col h3 {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: var(--rh-font-size-heading-sm, 1.25rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0 0 var(--rh-space-sm, 8px) 0;
+}
+
+section.comparison .compare-col.preferred h3 { color: var(--accent); }
+
+section.comparison .compare-col ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: var(--rh-font-size-body-text-md, 1rem);
+}
+section.comparison .compare-col li { margin-bottom: var(--rh-space-sm, 8px); }
+section.comparison .compare-col li::before {
+  content: '›';
+  color: var(--accent);
+  margin-right: var(--rh-space-sm, 8px);
+  font-weight: 700;
+}
+
+section.comparison .compare > .compare-vs {
+  align-self: center;
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* ============================================================
+   ARCHITECTURE SLIDE — box diagrams with optional arrows
+   ============================================================ */
+
+section.architecture h2 { margin-bottom: var(--rh-space-xl, 32px); }
+section.architecture h2 em { color: var(--accent); font-style: italic; }
+
+section.architecture .arch-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rh-space-md, 16px);
+  align-items: stretch;
+  justify-content: center;
+  margin-top: var(--rh-space-lg, 24px);
+}
+
+section.architecture .arch-box {
+  flex: 1 1 200px;
+  max-width: 280px;
+  background: var(--arch-box-bg, rgba(41, 41, 41, 0.6));
+  border: 1px solid var(--arch-box-border, #383838);
+  border-radius: var(--rh-border-radius-default, 3px);
+  padding: var(--rh-space-lg, 24px);
+  box-shadow: var(--rh-box-shadow-md, 0 4px 6px 1px rgba(21, 21, 21, 0.25));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--rh-space-sm, 8px);
+  text-align: left;
+}
+
+section.architecture .arch-box.highlight {
+  border-color: var(--accent);
+  border-width: 2px;
+  background: rgba(238, 0, 0, 0.05);
+}
+
+section.architecture .arch-box h3 {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: var(--rh-font-size-heading-sm, 1.25rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+section.architecture .arch-box p {
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+section.architecture .arch-arrow {
+  align-self: center;
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: 2rem;
+  color: var(--accent);
+  line-height: 1;
+  padding: 0 var(--rh-space-sm, 8px);
+}
+
+/* ============================================================
+   VIDEO SLIDE
+   ============================================================ */
+
+section.video h2 { margin-bottom: var(--rh-space-xl, 32px); }
+section.video h2 em { color: var(--accent); font-style: italic; }
+
+section.video .video-container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--rh-border-radius-default, 3px);
+  overflow: hidden;
+  box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+  background: var(--bg-secondary);
+  align-self: center;
+  cursor: pointer;
+}
+section.video .video-container iframe,
+section.video .video-container video {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+section.video .video-thumbnail {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+section.video .video-play-btn {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: rgba(238, 0, 0, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s ease;
+}
+section.video .video-play-btn::after {
+  content: '';
+  display: block;
+  width: 0; height: 0;
+  border-style: solid;
+  border-width: 14px 0 14px 24px;
+  border-color: transparent transparent transparent #fff;
+  margin-left: 4px;
+}
+section.video .video-container:hover .video-play-btn { background: rgba(238, 0, 0, 1); }
+
+/* ============================================================
+   MEDIA SLIDE — memes, GIFs, images
+   ============================================================ */
+
+section.media h2 { margin-bottom: var(--rh-space-xl, 32px); }
+section.media h2 em { color: var(--accent); font-style: italic; }
+
+section.media .media-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  width: 100%;
+  max-height: 65vh;
+  padding: var(--rh-space-md, 16px) 0;
+  align-self: center;
+}
+
+section.media .slide-media {
+  display: block;
+  max-width: 90%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--rh-border-radius-default, 3px);
+  box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+}
+
+.media-caption {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: var(--rh-space-md, 16px);
+  max-width: 720px;
+  align-self: center;
+}
 
 section.thankyou {
   align-items: center;
