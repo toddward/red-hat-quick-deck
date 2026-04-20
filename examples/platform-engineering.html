@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platform Engineering Isn't a Team — It's a Promise</title>
+  <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+
+    /* Marpit-generated CSS (includes Marpit reset + scoped rhqd theme) */
+    div.marpit > section {
+  width: 1280px;
+  height: 720px;
+
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+
+  scroll-snap-align: center center;
+
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}div.marpit > section::after {
+  bottom: 0;
+  content: attr(data-marpit-pagination);
+  padding: inherit;
+  pointer-events: none;
+  position: absolute;
+  right: 0;
+}div.marpit > section:not([data-marpit-pagination])::after {
+  display: none;
+}/* Normalization */div.marpit > section h1 {
+  font-size: 2em;
+  margin-block: 0.67em;
+}div.marpit > section video::-webkit-media-controls {
+  will-change: transform;
+}@page {
+  size: 100vw 100vh;
+  margin: 0;
+}@media print {html, body {
+  background-color: #fff;
+  margin: 0;
+  page-break-inside: avoid;
+  break-inside: avoid-page;
+}
+  div.marpit > section {
+    page-break-before: always;
+    break-before: page;
+  }
+
+  div.marpit > section, div.marpit > section * {
+    -webkit-print-color-adjust: exact !important;
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    transition: none !important;
+  }
+
+  div.marpit > svg[data-marpit-svg] {
+    display: block;
+    height: 100vh;
+    width: 100vw;
+  }
+}
+
+/* @theme rhqd */
+
+/*
+  Red Hat Quick Deck — Marpit theme
+  Phase 0 spike: Core Dark palette only, essential slide types.
+  Full parity (Core Light, Expressive Dark, media/video containers) lands in later phases.
+*/
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+
+div.marpit > section {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--rh-space-4xl, 80px) var(--rh-space-3xl, 64px);
+  box-sizing: border-box;
+}
+
+div.marpit > section * { box-sizing: border-box; }
+
+/* Active-slide visibility. Matching specificity with Marpit's scoped `div.marpit > section` rules. */
+div.marpit > section:not(.active) { display: none; }
+
+/* ============================================================
+   CORE DARK PALETTE (Phase 0 default)
+   ============================================================ */
+
+div.marpit > :where(section):not([\20 root]) {
+  color-scheme: dark;
+  --bg-primary: #000000;
+  --bg-secondary: #1f1f1f;
+  --bg-surface: #292929;
+  --text-primary: #ffffff;
+  --text-secondary: #c7c7c7;
+  --text-muted: #a3a3a3;
+  --accent: #ee0000;
+  --accent-dark: #a60000;
+  --accent-light: #f56e6e;
+  --tag-border: #383838;
+  --icon-filter: brightness(0) invert(1);
+  --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+}
+
+/* ============================================================
+   AMBIENT GLOW
+   ============================================================ */
+
+div.marpit > section::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+div.marpit > section.title::before,
+div.marpit > section.thankyou::before {
+  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.14) 0%, transparent 70%);
+}
+
+div.marpit > section > * { position: relative; z-index: 1; }
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+div.marpit > section h1,
+div.marpit > section h2,
+div.marpit > section h3 {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+div.marpit > section h1 {
+  font-size: var(--rh-font-size-heading-2xl, 3rem);
+  font-weight: 900;
+}
+
+div.marpit > section h2 {
+  font-size: var(--rh-font-size-heading-lg, 2rem);
+  font-weight: 700;
+}
+
+div.marpit > section p {
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+div.marpit > section em,
+div.marpit > section i {
+  color: var(--accent);
+  font-style: italic;
+}
+
+div.marpit > section strong,
+div.marpit > section b {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+div.marpit > section ul,
+div.marpit > section ol {
+  color: var(--text-secondary);
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  line-height: 1.6;
+  padding-left: var(--rh-space-lg, 24px);
+  margin: 0;
+}
+
+div.marpit > section li { margin-bottom: var(--rh-space-sm, 8px); }
+
+div.marpit > section a {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+
+/* Inline code + code blocks */
+div.marpit > section code {
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: 0.92em;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 8px;
+  border-radius: var(--rh-border-radius-default, 3px);
+}
+
+div.marpit > section pre {
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--tag-border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--rh-border-radius-default, 3px);
+  padding: var(--rh-space-md, 16px) var(--rh-space-lg, 24px);
+  margin: var(--rh-space-md, 16px) 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+div.marpit > section pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+}
+
+div.marpit > section img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ============================================================
+   UTILITIES — breadcrumb, slide-label, tags, logo, attribution
+   ============================================================ */
+
+div.marpit > section .breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--rh-space-sm, 8px);
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--rh-space-xl, 32px);
+}
+
+div.marpit > section section.breadcrumb {
+  --marpit-root-font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+}
+
+div.marpit > section .breadcrumb svg.rh-logo { margin-right: var(--rh-space-sm, 8px); height: 20px; }
+
+div.marpit > section .slide-label {
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--rh-space-lg, 24px);
+}
+
+div.marpit > section section.slide-label {
+  --marpit-root-font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+}
+
+div.marpit > section .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rh-space-sm, 8px);
+  margin-top: var(--rh-space-lg, 24px);
+}
+
+div.marpit > section .tag {
+  display: inline-block;
+  padding: var(--rh-space-xs, 4px) var(--rh-space-md, 16px);
+  border: 1px solid var(--tag-border);
+  border-radius: var(--rh-border-radius-pill, 64px);
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+div.marpit > section section.tag {
+  --marpit-root-font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+}
+
+div.marpit > section .tag.accent { border-color: var(--accent); color: var(--accent); }
+
+div.marpit > section .rh-logo { height: 28px; width: auto; }
+div.marpit > section .rh-logo.small { height: 20px; }
+div.marpit > section .rh-logo.large { height: 40px; }
+
+div.marpit > section .attribution {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  color: var(--text-muted);
+  margin-top: var(--rh-space-2xl, 48px);
+}
+
+div.marpit > section section.attribution {
+  --marpit-root-font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+}
+
+div.marpit > section .source {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  color: var(--text-muted);
+  margin-top: var(--rh-space-xl, 32px);
+  font-style: italic;
+}
+
+div.marpit > section section.source {
+  --marpit-root-font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+}
+
+div.marpit > section .logo-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--rh-space-2xl, 48px);
+}
+
+/* ============================================================
+   SLIDE TYPES (Phase 0 minimum: title, content, stat, quote, cta, thankyou)
+   ============================================================ */
+
+div.marpit > section.title h1 { font-size: var(--rh-font-size-heading-2xl, 3rem); }
+div.marpit > section.title h1 em { color: var(--accent); font-style: italic; }
+div.marpit > section.title p { margin-top: var(--rh-space-lg, 24px); max-width: 42em; }
+
+div.marpit > section.content h2 { margin-bottom: var(--rh-space-xl, 32px); }
+div.marpit > section.content h2 em { color: var(--accent); font-style: italic; }
+
+div.marpit > section.stat {
+  align-items: center;
+  text-align: center;
+}
+div.marpit > section.stat .big-number {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: calc(var(--marpit-root-font-size, 1rem) * 6.25); /* 100px */
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+  margin: var(--rh-space-md, 16px) 0;
+}
+div.marpit > section.stat div.marpit > section section.big-number {
+  --marpit-root-font-size: calc(var(--marpit-root-font-size, 1rem) * 6.25);
+}
+div.marpit > section.stat p { max-width: 32em; margin: 0 auto; }
+
+div.marpit > section.quote {
+  text-align: left;
+}
+div.marpit > section.quote blockquote {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: var(--rh-font-size-heading-lg, 2rem);
+  line-height: 1.3;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  border: none;
+  position: relative;
+  padding-left: var(--rh-space-2xl, 48px);
+}
+div.marpit > section.quote blockquote::before {
+  content: '“';
+  font-size: calc(var(--marpit-root-font-size, 1rem) * 6);
+  color: var(--accent);
+  opacity: 0.35;
+  position: absolute;
+  left: 0;
+  top: -calc(var(--marpit-root-font-size, 1rem) * 1.5);
+  line-height: 1;
+}
+
+div.marpit > section.cta { text-align: left; }
+div.marpit > section.cta h1 { font-size: var(--rh-font-size-heading-xl, 2.5rem); }
+div.marpit > section.cta h1 em { color: var(--accent); font-style: italic; }
+
+div.marpit > section.thankyou {
+  align-items: center;
+  text-align: center;
+}
+div.marpit > section.thankyou h1 {
+  font-size: var(--rh-font-size-heading-2xl, 3rem);
+  font-weight: 900;
+  margin-bottom: var(--rh-space-md, 16px);
+}
+div.marpit > section.thankyou h1 em { color: var(--accent); font-style: italic; }
+div.marpit > section.thankyou p { max-width: 36em; margin: 0 auto; }
+div.marpit > section.thankyou .attribution { text-align: center; }
+div.marpit > section.thankyou .logo-footer { margin-top: var(--rh-space-3xl, 64px); }
+div.marpit > section.thankyou .rh-logo.large { height: 48px; }
+
+/* ============================================================
+   ENTRANCE ANIMATIONS
+   ============================================================ */
+
+div.marpit > section.active > *:not(::before) {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+div.marpit > section.active > *:nth-child(1) { animation-delay: 0.0s; }
+div.marpit > section.active > *:nth-child(2) { animation-delay: 0.1s; }
+div.marpit > section.active > *:nth-child(3) { animation-delay: 0.2s; }
+div.marpit > section.active > *:nth-child(4) { animation-delay: 0.3s; }
+div.marpit > section.active > *:nth-child(5) { animation-delay: 0.4s; }
+div.marpit > section.active > *:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+
+    /* Shell: notes panel, controls, progress */
+    .controls {
+      position: fixed;
+      bottom: var(--rh-space-lg, 24px);
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 var(--rh-space-3xl, 64px);
+      font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--text-muted, #a3a3a3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .controls .nav-hint { opacity: 0.6; }
+    .controls .progress .current { color: var(--accent, #ee0000); font-weight: 700; }
+
+    .notes-panel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: rgba(20, 20, 20, 0.97);
+      border-left: 2px solid var(--accent, #ee0000);
+      padding: var(--rh-space-2xl, 48px) var(--rh-space-xl, 32px);
+      overflow-y: auto;
+      transition: right 0.3s ease-out;
+      z-index: 200;
+      font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+      font-size: var(--rh-font-size-body-text-md, 1rem);
+      color: var(--text-secondary, #c7c7c7);
+      line-height: 1.6;
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+    }
+    .notes-panel.visible { right: 0; }
+    .notes-panel h3 {
+      font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+      color: var(--accent, #ee0000);
+      font-size: var(--rh-font-size-heading-sm, 1.25rem);
+      margin: 0 0 var(--rh-space-md, 16px) 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .notes-panel p { color: var(--text-secondary, #c7c7c7); margin: 0 0 var(--rh-space-md, 16px) 0; }
+    .notes-panel a { color: var(--accent-light, #f56e6e); }
+    .notes-panel ul { padding-left: 1.25rem; }
+
+  </style>
+</head>
+<body>
+  <div class="marpit"><section id="1" data-class="title" data-theme="rhqd" class="title" style="--class:title;--theme:rhqd;" data-notes="&lt;p&gt;References:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.cncf.io/reports/state-of-platform-engineering-2025/&quot;&gt;CNCF State of Platform Engineering 2025&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://teamtopologies.com/&quot;&gt;Team Topologies: Organizing for Fast Flow&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://www.gartner.com/&quot;&gt;Gartner 2025: Platform Engineering Adoption&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Tips for viewers:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Arrow keys or click to navigate&lt;/li&gt;
+&lt;li&gt;Press 'N' to toggle these contextual notes&lt;/li&gt;
+&lt;li&gt;Works in any modern browser — share the HTML file directly&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;[IMAGE OPPORTUNITY] Nano Banana Pro 2 prompt:
+&amp;quot;abstract dark red architectural blueprint with glowing connection
+nodes on pure black background, cinematic 16:9, no text, Red Hat red
+(#ee0000) accents&amp;quot;&lt;/p&gt;
+"><div class="breadcrumb"><svg class="rh-logo small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat"><title>Red Hat</title><path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/><path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/></svg>› PLATFORM ENGINEERING WORKING GROUP</div>
+<div class="slide-label">—— INTERNAL DEVELOPER PLATFORMS · APR 20, 2026</div>
+<h1>Platform Engineering <em>Isn't a Team</em> — It's a Promise</h1>
+<p>A shared contract that developers can ship safely, quickly, and without waiting on humans.</p>
+<div class="tags">
+  <span class="tag">Internal Platforms</span>
+  <span class="tag">Golden Paths</span>
+  <span class="tag accent">Self-Service</span>
+</div>
+<div class="attribution">Red Hat · Platform Engineering · Quick Deck</div>
+</section>
+<section id="2" data-class="content" data-theme="rhqd" class="content" style="--class:content;--theme:rhqd;" data-notes="&lt;p&gt;The classic anti-pattern: teams rebrand the ops team as &amp;quot;platform team,&amp;quot;
+add a Backstage UI, and declare victory — while every PR still waits on
+a human to click approve.&lt;/p&gt;
+&lt;p&gt;The real test: can a new service go from &lt;code&gt;git init&lt;/code&gt; to production with
+zero tickets? If not, the platform is incomplete.&lt;/p&gt;
+&lt;p&gt;[VIDEO OPPORTUNITY] A 30-second clip of a developer shipping a service
+end-to-end without a single Slack DM would land this viscerally.&lt;/p&gt;
+"><div class="slide-label">—— THE PROBLEM</div>
+<h2>Most &quot;Platforms&quot; Are <em>Just Tickets</em> With a Dashboard</h2>
+<p>When every workflow routes through a human, the platform becomes the bottleneck it was meant to eliminate.</p>
+<ul>
+<li><strong>Tickets don't scale.</strong> One SRE per fifty developers means four-day queues.</li>
+<li><strong>&quot;Self-service&quot; with ten approvals isn't self-service.</strong> It's gatekeeping with a prettier UI.</li>
+<li><strong>Documentation isn't a platform.</strong> It's instructions for doing work the platform should have done.</li>
+</ul>
+<div class="source">Source: Red Hat State of Enterprise Open Source 2025</div>
+</section>
+<section id="3" data-class="stat" data-theme="rhqd" class="stat" style="--class:stat;--theme:rhqd;" data-notes="&lt;p&gt;The 73% figure comes from the CNCF's 2025 survey. The 2x multiplier on
+deploy frequency is the median; top-quartile orgs report 5-8x.&lt;/p&gt;
+&lt;p&gt;The gap widens with scale. Small teams see modest gains; orgs over
+500 engineers see the biggest multipliers because coordination cost
+compounds.&lt;/p&gt;
+&lt;p&gt;Caveat: &amp;quot;mature&amp;quot; is doing a lot of work in that sentence. The survey
+defines mature as: golden paths for ≥3 runtimes, &amp;lt;15min onboarding to
+first deploy, platform SLOs published.&lt;/p&gt;
+"><div class="slide-label">—— THE IMPACT</div>
+<h1><span class="big-number">73%</span></h1>
+<p>of engineering orgs with mature internal platforms ship <em>more than 2x</em> faster than those without.</p>
+<div class="source">Source: CNCF State of Platform Engineering 2025 · n=1,847</div>
+</section>
+<section id="4" data-class="content" data-theme="rhqd" class="content" style="--class:content;--theme:rhqd;" data-notes="&lt;p&gt;The tension here is between enforcement and enablement. A platform that
+forbids deviation becomes a new kind of bureaucracy. A platform with
+no defaults forces every team to rebuild the same scaffolding.&lt;/p&gt;
+&lt;p&gt;The sweet spot: defaults that are the right choice 80% of the time,
+with a clear process for the 20% who need something different —
+including a path back to the paved road when the custom thing
+becomes a burden.&lt;/p&gt;
+"><div class="slide-label">—— GOLDEN PATHS</div>
+<h2>A Good Platform Has <em>Opinions</em></h2>
+<p>Paved roads are faster than dirt tracks. Make the default choice the right choice.</p>
+<ul>
+<li><strong>Runtime templates</strong> — pre-wired observability, secrets, and tracing</li>
+<li><strong>Blessed CI/CD</strong> — security scanning and SBOM generation built in</li>
+<li><strong>Deployment contracts</strong> — explicit SLOs, rollback behavior, blast radius</li>
+<li><strong>Escape hatches</strong> — opinions should be overridable, never locked in</li>
+</ul>
+<div class="source">Every paved road should have a clearly-marked off-ramp.</div>
+</section>
+<section id="5" data-class="quote" data-theme="rhqd" class="quote" style="--class:quote;--theme:rhqd;" data-notes="&lt;p&gt;This is the most important slide in the deck. The vendor pitch — &amp;quot;buy
+our platform&amp;quot; — misunderstands what a platform is.&lt;/p&gt;
+&lt;p&gt;Tools are necessary but not sufficient. The platform emerges from the
+combination of tools + contracts + on-call commitments + evolution
+cadence. It's a product, not a purchase.&lt;/p&gt;
+&lt;p&gt;Related reading:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Team Topologies, Chapter 5 (Platform Team patterns)&lt;/li&gt;
+&lt;li&gt;Evan Bottcher: &amp;quot;What I Talk About When I Talk About Platforms&amp;quot;&lt;/li&gt;
+&lt;/ul&gt;
+"><div class="slide-label">—— PRINCIPLE</div>
+<blockquote>
+<p>You can't buy a platform. You can only buy <em>components</em>. The platform is what you build from those components to serve <em>your</em> developers.</p>
+</blockquote>
+<div class="attribution">— Manuel Pais, co-author of <em>Team Topologies</em></div>
+</section>
+<section id="6" data-class="cta" data-theme="rhqd" class="cta" style="--class:cta;--theme:rhqd;" data-notes="&lt;p&gt;Contact:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Red Hat Platform Engineering: &lt;a href=&quot;http://redhat.com/platform&quot;&gt;redhat.com/platform&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Internal working group: #platform-eng on Slack&lt;/li&gt;
+&lt;li&gt;Quarterly roadmap: &lt;a href=&quot;http://docs.platform.redhat.com/roadmap&quot;&gt;docs.platform.redhat.com/roadmap&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;[IMAGE OPPORTUNITY] Nano Banana Pro 2 prompt:
+&amp;quot;single glowing red paved road cutting through a dark abstract
+landscape of tangled dirt trails, cinematic lighting, 16:9, no text&amp;quot;&lt;/p&gt;
+"><div class="slide-label">—— NEXT STEPS</div>
+<h1>Start With <em>One</em> Paved Road</h1>
+<p>Pick the most common service shape, build a proper golden path for it, and measure the time from <code>git init</code> to production.</p>
+<ul>
+<li><strong>Week 1</strong> — Identify the three most-shipped service archetypes</li>
+<li><strong>Month 1</strong> — Productionize one golden path end-to-end (template → deploy)</li>
+<li><strong>Quarter 1</strong> — Publish platform SLOs and retire the ticket queue for path users</li>
+</ul>
+<div class="source">One solid paved road beats ten unfinished ones.</div>
+</section>
+<section id="7" data-class="thankyou" data-theme="rhqd" class="thankyou" style="--class:thankyou;--theme:rhqd;" data-notes="&lt;p&gt;Deck generated via red-hat-quick-deck skill on the feature/marp-inclusion
+branch. Edit the source at examples/platform-engineering.md and re-render
+with &lt;code&gt;node scripts/render.mjs examples/platform-engineering.md&lt;/code&gt;.&lt;/p&gt;
+">
+<h1>Thank <em>You</em></h1>
+<p>Questions, corrections, and war stories welcome.</p>
+<div class="attribution">Red Hat · Platform Engineering · Quick Deck</div>
+
+<div class="logo-footer"><svg class="rh-logo large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat"><title>Red Hat</title><path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/><path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/><path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/></svg></div>
+</section>
+</div>
+
+  <div class="notes-panel" aria-hidden="true">
+    <h3>Contextual Notes</h3>
+    <div class="notes-content"><p>Press <strong>N</strong> to toggle these notes.</p></div>
+  </div>
+
+  <div class="controls">
+    <div class="nav-hint">← → or click to navigate · N for notes</div>
+    <div class="progress"><span class="current">1</span> / <span class="total">1</span></div>
+  </div>
+
+  <script>
+(function () {
+  const slides = document.querySelectorAll('section');
+  const currentEl = document.querySelector('.controls .current');
+  const totalEl = document.querySelector('.controls .total');
+  const notesPanel = document.querySelector('.notes-panel');
+  const notesContent = document.querySelector('.notes-panel .notes-content');
+  let idx = 0;
+  let notesVisible = false;
+
+  totalEl.textContent = slides.length;
+
+  function pauseAllMedia() {
+    document.querySelectorAll('section:not(.active) video').forEach((v) => v.pause());
+    document.querySelectorAll('section:not(.active) iframe').forEach((f) => {
+      try {
+        f.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+        f.contentWindow.postMessage('{"method":"pause"}', '*');
+      } catch (e) {}
+    });
+  }
+
+  function playActiveMedia() {
+    document.querySelectorAll('section.active video').forEach((v) => {
+      const p = v.play();
+      if (p && typeof p.catch === 'function') p.catch(() => {});
+    });
+    document.querySelectorAll('section.active iframe').forEach((f) => {
+      try {
+        f.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+        f.contentWindow.postMessage('{"method":"play"}', '*');
+      } catch (e) {}
+    });
+  }
+
+  function updateNotesContent() {
+    if (!notesContent) return;
+    const raw = slides[idx].dataset.notes || '';
+    notesContent.innerHTML = raw || '<p><em>No additional notes for this slide.</em></p>';
+  }
+
+  function show(i) {
+    slides.forEach((s, j) => s.classList.toggle('active', j === i));
+    currentEl.textContent = i + 1;
+    pauseAllMedia();
+    playActiveMedia();
+    if (notesVisible) updateNotesContent();
+  }
+
+  function next() { if (idx < slides.length - 1) { idx++; show(idx); } }
+  function prev() { if (idx > 0) { idx--; show(idx); } }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft') { prev(); }
+    else if (e.key === 'n' || e.key === 'N') {
+      notesVisible = !notesVisible;
+      if (notesPanel) {
+        notesPanel.classList.toggle('visible', notesVisible);
+        notesPanel.setAttribute('aria-hidden', notesVisible ? 'false' : 'true');
+      }
+      updateNotesContent();
+    }
+  });
+
+  // Click-to-play for video thumbnails (protocol-aware). Runs before nav click.
+  document.addEventListener('click', (e) => {
+    const vc = e.target.closest('.video-container[data-video-id]');
+    if (!vc) return;
+    e.stopImmediatePropagation();
+    const vid = vc.dataset.videoId;
+    if (window.location.protocol === 'file:') {
+      window.open('https://www.youtube.com/watch?v=' + vid, '_blank');
+    } else {
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + vid + '?autoplay=1';
+      iframe.setAttribute('frameborder', '0');
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', '');
+      vc.innerHTML = '';
+      vc.appendChild(iframe);
+    }
+  });
+
+  // Navigation click handler — guards media/controls/notes from triggering nav.
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('.controls')) return;
+    if (e.target.closest('.notes-panel')) return;
+    if (e.target.closest('.video-container')) return;
+    if (e.target.closest('.media-container')) return;
+    const x = e.clientX / window.innerWidth;
+    x > 0.5 ? next() : prev();
+  });
+
+  // Touch swipe support
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const diff = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(diff) > 50) { diff < 0 ? next() : prev(); }
+  });
+
+  // Honor ?slide=N or #N in the URL for deep-linking and screenshot verification.
+  const urlMatch = (location.hash.match(/^#(\d+)$/) || (location.search.match(/[?&]slide=(\d+)/) || [])).slice(-1)[0];
+  const initial = urlMatch ? Math.max(0, Math.min(slides.length - 1, parseInt(urlMatch, 10) - 1)) : 0;
+  idx = initial;
+  show(idx);
+})();
+
+  </script>
+</body>
+</html>

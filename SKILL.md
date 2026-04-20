@@ -28,6 +28,46 @@ narrative story arcs to make technical content compelling and memorable.
    - Options: "Dark mode (cinematic, dark backgrounds — best for screens & presenting)", "Light mode (clean, white backgrounds — best for print & email sharing)"
    - Default to **Dark mode** if the user doesn't specify or says "either" or "don't care."
 
+## Authoring Mode — Markdown (preferred) vs. HTML (fallback)
+
+This skill produces the same cinematic HTML output via two authoring paths.
+Choose based on your environment **before** you start designing slides:
+
+### Markdown mode (preferred — when Bash/shell is available)
+
+If you can execute shell commands (Claude Code, terminal-capable environments):
+
+1. Author the deck as Marp markdown (`<deck-slug>.md`)
+2. Render with `node scripts/render.mjs <deck-slug>.md` from the repo root
+3. Deliver **both** the `.md` source (editable) and the `.html` (shareable)
+
+**Why this is preferred**: users who want to tweak wording, reorder slides, or
+regenerate the HTML later can edit the markdown and re-run the render script.
+The HTML output is byte-for-byte equivalent to the HTML-direct path below.
+
+**Read `references/markdown-authoring.md`** for the full markdown authoring
+guide — YAML front-matter, slide-type directives, notes syntax, render
+invocation, and the markdown-mode quality checklist.
+
+### HTML mode (fallback — when shell is unavailable)
+
+If shell is **not** available (Claude web, Gemini Gems, anywhere you can only
+emit text into a chat response), follow the slide-type sections in the rest
+of this file to emit a single self-contained `.html` file directly. Deliver
+only the `.html`.
+
+The HTML-direct path has been the default for the skill's history and remains
+fully supported. Every design-system rule below — colors, tokens, typography,
+logo, icons, spacing, slide types, navigation JS, quality checklist — applies
+to both authoring modes.
+
+**How to decide at generation time**:
+
+- If you have a Bash or file-writing tool in this session → markdown mode.
+- If you can only return HTML as a chat message → HTML mode.
+- When in doubt, prefer markdown — falling back to HTML on render failure is
+  trivial (emit the HTML directly instead of the `.md`).
+
 ## What This Skill Produces
 
 A single `.html` file that:

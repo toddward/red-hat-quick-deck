@@ -17,6 +17,7 @@ import { dirname, resolve, basename, extname, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { Marpit } from '@marp-team/marpit';
 import MarkdownIt from 'markdown-it';
+import { smallLogo, largeLogo } from '../templates/logos.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -88,6 +89,43 @@ function injectNotesAttrs(slidesHtml, commentsPerSlide) {
   });
 }
 
+/**
+ * Auto-inject the Red Hat logo into title and thankyou slides.
+ *
+ * - Title slides (class contains "title"): the logo is prepended into the
+ *   existing `.breadcrumb` div. Author writes just the breadcrumb text.
+ * - Thankyou slides (class contains "thankyou"): a `<div class="logo-footer">`
+ *   is appended at the end of the section, below author content.
+ *
+ * If a slide already contains a `.rh-logo`, injection is skipped (author
+ * opt-out).
+ */
+function injectLogos(slidesHtml, mode) {
+  const small = smallLogo(mode);
+  const large = largeLogo(mode);
+
+  return slidesHtml.replace(/<section\b([^>]*)>([\s\S]*?)<\/section>/g, (_, attrs, body) => {
+    const classMatch = attrs.match(/\bclass="([^"]*)"/);
+    const classes = classMatch ? classMatch[1].split(/\s+/) : [];
+    const isTitle = classes.includes('title');
+    const isThankyou = classes.includes('thankyou');
+    if (!isTitle && !isThankyou) return `<section${attrs}>${body}</section>`;
+    if (/\brh-logo\b/.test(body)) return `<section${attrs}>${body}</section>`; // author opt-out
+
+    let newBody = body;
+    if (isTitle) {
+      newBody = newBody.replace(
+        /<div class="breadcrumb">/,
+        `<div class="breadcrumb">${small}`,
+      );
+    }
+    if (isThankyou) {
+      newBody = newBody + `\n<div class="logo-footer">${large}</div>\n`;
+    }
+    return `<section${attrs}>${newBody}</section>`;
+  });
+}
+
 function substitute(template, map) {
   return template.replace(/\{\{(\w+)\}\}/g, (_, key) => {
     if (!(key in map)) throw new Error(`Template variable {{${key}}} has no substitution`);
@@ -117,7 +155,14 @@ async function main() {
   marpit.themeSet.default = marpit.themeSet.add(themeCss);
 
   const { html: slidesHtml, css: marpitCss, comments } = marpit.render(markdown, { htmlAsArray: false });
-  const slidesWithNotes = injectNotesAttrs(slidesHtml, comments);
+
+  // Detect palette mode from front-matter's `class: mode-dark|light|expressive` directive.
+  // Default: dark. Drives logo variant selection (reverse wordmark on dark, standard on light).
+  const modeMatch = markdown.match(/^class:\s*.*\bmode-(dark|light|expressive)\b/m);
+  const mode = args.mode || (modeMatch ? modeMatch[1] : 'dark');
+
+  const withLogos = injectLogos(slidesHtml, mode);
+  const slidesWithNotes = injectNotesAttrs(withLogos, comments);
 
   const titleMatch = markdown.match(/^title:\s*(.+)$/m);
   const deckTitle = titleMatch ? titleMatch[1].trim().replace(/^['"]|['"]$/g, '') : 'Red Hat Quick Deck';

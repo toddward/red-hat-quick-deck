@@ -99,5 +99,9 @@
     if (Math.abs(diff) > 50) { diff < 0 ? next() : prev(); }
   });
 
-  show(0);
+  // Honor ?slide=N or #N in the URL for deep-linking and screenshot verification.
+  const urlMatch = (location.hash.match(/^#(\d+)$/) || (location.search.match(/[?&]slide=(\d+)/) || [])).slice(-1)[0];
+  const initial = urlMatch ? Math.max(0, Math.min(slides.length - 1, parseInt(urlMatch, 10) - 1)) : 0;
+  idx = initial;
+  show(idx);
 })();
