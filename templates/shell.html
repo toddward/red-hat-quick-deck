@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{TITLE}}</title>
+  <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+
+    /* Marpit-generated CSS (includes Marpit reset + scoped rhqd theme) */
+    {{MARPIT_CSS}}
+
+    /* Shell: notes panel, controls, progress */
+    .controls {
+      position: fixed;
+      bottom: var(--rh-space-lg, 24px);
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 var(--rh-space-3xl, 64px);
+      font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+      font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+      color: var(--text-muted, #a3a3a3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      z-index: 100;
+      pointer-events: none;
+    }
+    .controls .nav-hint { opacity: 0.6; }
+    .controls .progress .current { color: var(--accent, #ee0000); font-weight: 700; }
+
+    .notes-panel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: 400px;
+      height: 100vh;
+      background: rgba(20, 20, 20, 0.97);
+      border-left: 2px solid var(--accent, #ee0000);
+      padding: var(--rh-space-2xl, 48px) var(--rh-space-xl, 32px);
+      overflow-y: auto;
+      transition: right 0.3s ease-out;
+      z-index: 200;
+      font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+      font-size: var(--rh-font-size-body-text-md, 1rem);
+      color: var(--text-secondary, #c7c7c7);
+      line-height: 1.6;
+      box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+      box-sizing: border-box;
+    }
+    .notes-panel.visible { right: 0; }
+    .notes-panel h3 {
+      font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+      color: var(--accent, #ee0000);
+      font-size: var(--rh-font-size-heading-sm, 1.25rem);
+      margin: 0 0 var(--rh-space-md, 16px) 0;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .notes-panel p { color: var(--text-secondary, #c7c7c7); margin: 0 0 var(--rh-space-md, 16px) 0; }
+    .notes-panel a { color: var(--accent-light, #f56e6e); }
+    .notes-panel ul { padding-left: 1.25rem; }
+
+  </style>
+</head>
+<body>
+  {{SLIDES_HTML}}
+
+  <div class="notes-panel" aria-hidden="true">
+    <h3>Contextual Notes</h3>
+    <div class="notes-content"><p>Press <strong>N</strong> to toggle these notes.</p></div>
+  </div>
+
+  <div class="controls">
+    <div class="nav-hint">← → or click to navigate · N for notes</div>
+    <div class="progress"><span class="current">1</span> / <span class="total">1</span></div>
+  </div>
+
+  <script>
+{{SHELL_JS}}
+  </script>
+</body>
+</html>

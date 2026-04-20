@@ -1,0 +1,18 @@
+{
+  "name": "red-hat-quick-deck",
+  "version": "2.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MARP-based render pipeline for Red Hat Quick Deck",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "render": "node scripts/render.mjs",
+    "render:example": "node scripts/render.mjs examples/hello-world.md"
+  },
+  "dependencies": {
+    "@marp-team/marpit": "^3.1.2",
+    "markdown-it": "^14.1.0"
+  }
+}

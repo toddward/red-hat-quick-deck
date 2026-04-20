@@ -1,0 +1,292 @@
+/* @theme rhqd */
+
+/*
+  Red Hat Quick Deck — Marpit theme
+  Phase 0 spike: Core Dark palette only, essential slide types.
+  Full parity (Core Light, Expressive Dark, media/video containers) lands in later phases.
+*/
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+
+section {
+  width: 100vw;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--rh-space-4xl, 80px) var(--rh-space-3xl, 64px);
+  box-sizing: border-box;
+}
+
+section * { box-sizing: border-box; }
+
+/* Active-slide visibility. Matching specificity with Marpit's scoped `div.marpit > section` rules. */
+section:not(.active) { display: none; }
+
+/* ============================================================
+   CORE DARK PALETTE (Phase 0 default)
+   ============================================================ */
+
+:root {
+  color-scheme: dark;
+  --bg-primary: #000000;
+  --bg-secondary: #1f1f1f;
+  --bg-surface: #292929;
+  --text-primary: #ffffff;
+  --text-secondary: #c7c7c7;
+  --text-muted: #a3a3a3;
+  --accent: #ee0000;
+  --accent-dark: #a60000;
+  --accent-light: #f56e6e;
+  --tag-border: #383838;
+  --icon-filter: brightness(0) invert(1);
+  --icon-filter-accent: invert(12%) sepia(100%) saturate(10000%) hue-rotate(0deg) brightness(95%);
+}
+
+/* ============================================================
+   AMBIENT GLOW
+   ============================================================ */
+
+section::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+section.title::before,
+section.thankyou::before {
+  background: radial-gradient(ellipse, rgba(238, 0, 0, 0.14) 0%, transparent 70%);
+}
+
+section > * { position: relative; z-index: 1; }
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+section h1,
+section h2,
+section h3 {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+section h1 {
+  font-size: var(--rh-font-size-heading-2xl, 3rem);
+  font-weight: 900;
+}
+
+section h2 {
+  font-size: var(--rh-font-size-heading-lg, 2rem);
+  font-weight: 700;
+}
+
+section p {
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+section em,
+section i {
+  color: var(--accent);
+  font-style: italic;
+}
+
+section strong,
+section b {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+section ul,
+section ol {
+  color: var(--text-secondary);
+  font-size: var(--rh-font-size-body-text-lg, 1.125rem);
+  line-height: 1.6;
+  padding-left: var(--rh-space-lg, 24px);
+  margin: 0;
+}
+
+section li { margin-bottom: var(--rh-space-sm, 8px); }
+
+section a {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+
+/* ============================================================
+   UTILITIES — breadcrumb, slide-label, tags, logo, attribution
+   ============================================================ */
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--rh-space-xl, 32px);
+}
+
+.breadcrumb svg { margin-right: var(--rh-space-sm, 8px); }
+
+.slide-label {
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: var(--rh-space-lg, 24px);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rh-space-sm, 8px);
+  margin-top: var(--rh-space-lg, 24px);
+}
+
+.tag {
+  display: inline-block;
+  padding: var(--rh-space-xs, 4px) var(--rh-space-md, 16px);
+  border: 1px solid var(--tag-border);
+  border-radius: var(--rh-border-radius-pill, 64px);
+  font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.tag.accent { border-color: var(--accent); color: var(--accent); }
+
+.rh-logo { height: 28px; width: auto; }
+.rh-logo.small { height: 20px; }
+.rh-logo.large { height: 40px; }
+
+.attribution {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-sm, 0.875rem);
+  color: var(--text-muted);
+  margin-top: var(--rh-space-2xl, 48px);
+}
+
+.source {
+  font-family: var(--rh-font-family-body-text, 'Red Hat Text', sans-serif);
+  font-size: var(--rh-font-size-body-text-xs, 0.75rem);
+  color: var(--text-muted);
+  margin-top: var(--rh-space-xl, 32px);
+  font-style: italic;
+}
+
+.logo-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--rh-space-2xl, 48px);
+}
+
+/* ============================================================
+   SLIDE TYPES (Phase 0 minimum: title, content, stat, quote, cta, thankyou)
+   ============================================================ */
+
+section.title h1 { font-size: var(--rh-font-size-heading-2xl, 3rem); }
+section.title h1 em { color: var(--accent); font-style: italic; }
+section.title p { margin-top: var(--rh-space-lg, 24px); max-width: 42em; }
+
+section.content h2 { margin-bottom: var(--rh-space-xl, 32px); }
+section.content h2 em { color: var(--accent); font-style: italic; }
+
+section.stat {
+  align-items: center;
+  text-align: center;
+}
+section.stat .big-number {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: 6.25rem; /* 100px */
+  font-weight: 900;
+  color: var(--accent);
+  line-height: 1;
+  margin: var(--rh-space-md, 16px) 0;
+}
+section.stat p { max-width: 32em; margin: 0 auto; }
+
+section.quote {
+  text-align: left;
+}
+section.quote blockquote {
+  font-family: var(--rh-font-family-heading, 'Red Hat Display', sans-serif);
+  font-size: var(--rh-font-size-heading-lg, 2rem);
+  line-height: 1.3;
+  color: var(--text-primary);
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  border: none;
+  position: relative;
+  padding-left: var(--rh-space-2xl, 48px);
+}
+section.quote blockquote::before {
+  content: '“';
+  font-size: 6rem;
+  color: var(--accent);
+  opacity: 0.35;
+  position: absolute;
+  left: 0;
+  top: -1.5rem;
+  line-height: 1;
+}
+
+section.cta { text-align: left; }
+section.cta h1 { font-size: var(--rh-font-size-heading-xl, 2.5rem); }
+section.cta h1 em { color: var(--accent); font-style: italic; }
+
+section.thankyou {
+  align-items: center;
+  text-align: center;
+}
+section.thankyou h1 {
+  font-size: var(--rh-font-size-heading-2xl, 3rem);
+  font-weight: 900;
+}
+section.thankyou h1 em { color: var(--accent); font-style: italic; }
+
+/* ============================================================
+   ENTRANCE ANIMATIONS
+   ============================================================ */
+
+section.active > *:not(::before) {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+section.active > *:nth-child(1) { animation-delay: 0.0s; }
+section.active > *:nth-child(2) { animation-delay: 0.1s; }
+section.active > *:nth-child(3) { animation-delay: 0.2s; }
+section.active > *:nth-child(4) { animation-delay: 0.3s; }
+section.active > *:nth-child(5) { animation-delay: 0.4s; }
+section.active > *:nth-child(6) { animation-delay: 0.5s; }
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
