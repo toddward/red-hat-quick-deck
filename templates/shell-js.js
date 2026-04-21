@@ -1,5 +1,13 @@
 (function () {
   const slides = document.querySelectorAll('section');
+
+  // Inject index variables for dynamic staggered animation delays
+  slides.forEach(slide => {
+    Array.from(slide.children).forEach((child, i) => {
+      child.style.setProperty('--anim-idx', i);
+    });
+  });
+
   const currentEl = document.querySelector('.controls .current');
   const totalEl = document.querySelector('.controls .total');
   const notesPanel = document.querySelector('.notes-panel');
