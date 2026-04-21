@@ -529,7 +529,7 @@ section.thankyou .rh-logo.large { height: 48px; }
 section.active > *:not(::before) {
   animation: fadeSlideUp 0.6s ease-out forwards;
   opacity: 0;
-  animation-delay: calc((var(--anim-idx, 1) * 0.1s) - 0.1s);
+  animation-delay: calc(var(--anim-idx, 0) * 0.1s);
 }
 
 @keyframes fadeSlideUp {

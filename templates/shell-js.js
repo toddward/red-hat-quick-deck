@@ -4,7 +4,7 @@
   // Inject index variables for dynamic staggered animation delays
   slides.forEach(slide => {
     Array.from(slide.children).forEach((child, i) => {
-      child.style.setProperty('--anim-idx', i + 1);
+      child.style.setProperty('--anim-idx', i);
     });
   });
 
