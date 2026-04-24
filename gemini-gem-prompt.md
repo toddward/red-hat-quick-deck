@@ -528,6 +528,17 @@ Include this in every deck:
     if (Math.abs(diff) > 50) { diff < 0 ? next() : prev(); }
   });
 
+  // Print / PDF export — clear JS-set inline display so all slides render in print,
+  // then restore the single-slide presenter view when the print dialog closes.
+  window.addEventListener('beforeprint', () => {
+    slides.forEach(s => { s.style.display = ''; });
+    document.body.classList.add('printing');
+  });
+  window.addEventListener('afterprint', () => {
+    document.body.classList.remove('printing');
+    show(idx);
+  });
+
   show(0);
 })();
 ```
@@ -547,6 +558,188 @@ Include this in every deck:
   to   { opacity: 1; transform: translateY(0); }
 }
 ```
+
+## Print / PDF Export Styles
+
+Every deck must include an `@media print` block so users can produce a multi-page PDF via
+the browser's `Cmd/Ctrl+P → Save as PDF`. Without it, only the first slide prints — because
+the navigation JS sets inline `style="display: none"` on non-active slides.
+
+**Fidelity requirement:** A printed PDF page must look like a shrunken on-screen slide — same
+headline weight, same bullet alignment, same card geometry. The print CSS only changes what's
+physically required for paper (ink palette, page breaks, hidden chrome, disabled animations)
+and keeps everything else identical. Pin print typography and bullet geometry to fixed `pt`
+values — never let `clamp()`/`vw` recompute in print context, and give each page a 16:9
+aspect ratio so proportions match the screen slide.
+
+```css
+@media print {
+  /* Custom 16:9 page — each page has the same aspect ratio as an on-screen slide. */
+  @page { size: 13.33in 7.5in; margin: 0; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  html, body {
+    height: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .deck {
+    height: auto !important; width: auto !important;
+    position: static !important; overflow: visible !important;
+  }
+
+  .slide {
+    display: flex !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 13.33in !important;
+    height: 7.5in !important;
+    padding: 0.55in 0.85in !important;
+    gap: 0.14in !important;
+    box-sizing: border-box !important;
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: hidden !important;
+  }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .slide::before, .slide::after { display: none !important; }
+
+  /* Pin typography to fixed pt values (no clamp/vw in print) */
+  .headline-xl { font-size: 60pt !important; line-height: 1.05 !important; letter-spacing: -0.02em; }
+  .headline-lg { font-size: 42pt !important; line-height: 1.05 !important; letter-spacing: -0.02em; }
+  .headline-md { font-size: 28pt !important; line-height: 1.1 !important; }
+  .subtitle, .body-text { font-size: 14pt !important; line-height: 1.45 !important; }
+  .big-number { font-size: 150pt !important; line-height: 0.9 !important; letter-spacing: -0.03em; }
+  .quote { font-size: 30pt !important; line-height: 1.2 !important; }
+  .slide-label, .breadcrumb { font-size: 10pt !important; letter-spacing: 0.1em; }
+  .attribution, .source, .nav-hint,
+  .arch-layer .arch-tag, .compare-col .lead, .proof-card .proof-title,
+  .quote-attribution, .tag { font-size: 9pt !important; }
+
+  /* Bullet geometry: pin ALL dimensions in pt so marks align identically to screen */
+  .bullet-list { gap: 10pt !important; max-width: none !important; }
+  .bullet-list li {
+    padding-left: 18pt !important;
+    font-size: 12pt !important;
+    line-height: 1.45 !important;
+  }
+  .bullet-list li::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0.7em !important;
+    width: 10pt !important;
+    height: 2pt !important;
+    background: #ee0000 !important;
+    border-radius: 0 !important;
+  }
+
+  .compare-grid, .proof-grid { gap: 0.18in !important; }
+  .compare-col, .proof-card, .arch-layer { padding: 0.2in !important; }
+  .arch-stack { gap: 3pt !important; }
+  .breadcrumb { top: 0.4in !important; left: 0.85in !important; }
+  .attribution { bottom: 0.4in !important; left: 0.85in !important; }
+
+  .slide .animate-in,
+  .slide.active .animate-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .controls, .nav-hint, .notes-panel { display: none !important; }
+  .ambient-glow, .bg-glow, [class*="glow"] { display: none !important; }
+
+  /* Video slides: keep thumbnail, drop play button + iframe, show URL caption */
+  .video-container .video-play-btn,
+  .video-container .play-button,
+  .video-container iframe { display: none !important; }
+  .video-container { aspect-ratio: auto; max-height: 4.5in; }
+  .video-container img { max-height: 4.5in; object-fit: contain; }
+  .video-container[data-video-url]::after {
+    content: "▶ " attr(data-video-url);
+    display: block;
+    font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+    font-size: 10pt;
+    color: #6a6e73;
+    margin-top: 6pt;
+    word-break: break-all;
+  }
+
+  .media-container { max-height: 5in !important; page-break-inside: avoid; }
+  .media-container img, .slide-media { max-height: 5in; object-fit: contain; }
+}
+```
+
+### Print Palette Override (Dark Decks Only)
+
+For Core Dark / Expressive Dark decks, also emit this block so printed output is ink-efficient.
+Omit it for Core Light decks.
+
+```css
+@media print {
+  :root { color-scheme: light; }
+  body, .deck, .slide { background: #fff !important; color: #151515 !important; }
+  .headline, h1, h2, h3,
+  .headline-xl, .headline-lg, .headline-md,
+  .big-number, .quote, .stat-number { color: #151515 !important; }
+  .subtitle, .body-text, p, li, .bullet-list li, .media-caption,
+  .compare-col p, .proof-card p { color: #3c3f42 !important; }
+  /* Bold labels inside bullets/cards inherit dark-mode white on screen — remap to dark for print,
+     otherwise <strong> renders white-on-white (invisible but still takes layout width, which
+     looks like a giant gap before the visible bullet text). */
+  .bullet-list li strong, .compare-col strong, .proof-card strong,
+  p strong, li strong { color: #151515 !important; font-weight: 700 !important; }
+  .breadcrumb, .slide-label, .nav-label, .source, .attribution,
+  .quote-attribution, .tag,
+  .arch-layer .arch-tag, .compare-col .lead, .proof-card .proof-title {
+    color: #6a6e73 !important;
+  }
+  .accent, .red-accent, [class*="red-50"],
+  .big-number, .compare-col.winner .lead,
+  .proof-card .proof-title { color: #ee0000 !important; }
+  .tag, [class*="tag"] {
+    background: transparent !important;
+    border-color: #3c3f42 !important;
+    color: #151515 !important;
+  }
+  .tag.hot, .compare-col.winner { border-color: #ee0000 !important; }
+  .compare-col, .proof-card, .arch-layer {
+    background: #fff !important;
+    border-color: #c7c7c7 !important;
+  }
+  .arch-layer.os-added {
+    border-color: #ee0000 !important;
+    background: rgba(238, 0, 0, 0.04) !important;
+  }
+  .proof-card { border-left-color: #ee0000 !important; }
+
+  /* Swap reverse (white) wordmark → dark for print. Targets the wordmark path by its
+     original fill — the canonical 613×145 logo has the wordmark as the last path with
+     fill="#fff". Fedora silhouette (fill="#e00") stays red in both modes per brand. */
+  body.printing .rh-logo path[fill="#fff"] { fill: #151515 !important; }
+}
+```
+
+### Video slides
+
+Every `.video-container` must carry `data-video-url="[full URL]"` in addition to
+`data-video-id`. The print CSS reads this attribute to render the URL as a caption under
+the thumbnail (videos don't play in PDFs).
+
+## File Delivery
+
+Save **two** files per deck (same kebab-case filename):
+
+1. `[deck-name].html` — interactive HTML deck
+2. `[deck-name].md` — Markdown outline companion for editable leave-behinds
+
+The `.md` file mirrors the deck's narrative: `# Title`, then `## Slide N — Headline`
+sections with bullets, stat values as `**42M**`, quotes as blockquotes, video/media URLs
+as plain links, and each slide's contextual notes under `> Contextual notes:`.
 
 ---
 
@@ -592,6 +785,14 @@ Before delivering, verify:
 - [ ] Narrative follows a clear story arc with emotional rhythm
 - [ ] Thank You slide is present as the final slide with author name, role, and Red Hat logo
 - [ ] Accent word(s) in title headline are colored red-50
+- [ ] Logo is the **official** 613×145 Red Hat SVG with all three canonical paths — never a silhouette, wordmark-only, or stylized approximation
+- [ ] `@media print` block is present and resets inline `display:none` with `!important`
+- [ ] Print CSS uses a custom 16:9 page, fixed `pt` typography (no `clamp()`/`vw`), and pt-based bullet geometry so the PDF is a faithful shrink of the on-screen slide
+- [ ] `beforeprint` / `afterprint` listeners wired in the navigation IIFE
+- [ ] Dark decks include the print palette override block (wordmark swap via `path[fill="#fff"]`); light decks omit it
+- [ ] Palette override remaps `<strong>` inside bullets/cards to `#151515` — forgetting this makes bold labels invisible on paper and leaves a big gap before visible text
+- [ ] Every `.video-container` carries a `data-video-url` attribute
+- [ ] Markdown companion `.md` file saved alongside the `.html`
 
 ## Example: Target Aesthetic
 

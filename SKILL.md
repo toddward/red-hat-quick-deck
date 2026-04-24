@@ -490,6 +490,8 @@ using design tokens for sizing, spacing, and borders:
     /* === SLIDE TYPES === */
     /* === CONTEXTUAL NOTES PANEL === */
     /* === ANIMATIONS === */
+    /* === PRINT / PDF EXPORT === */          /* @media print — see "Print / PDF Export Styles" */
+    /* === PRINT PALETTE OVERRIDE === */      /* dark-mode decks only — remaps to ink-efficient light */
   </style>
 </head>
 <body>
@@ -497,8 +499,14 @@ using design tokens for sizing, spacing, and borders:
     <!-- SLIDE 1: TITLE (includes logo in breadcrumb) -->
     <div class="slide">
       <div class="breadcrumb">
-        <!-- Inline Red Hat logo SVG (reverse for dark, standard for light) -->
-        <svg class="rh-logo small" ...>[appropriate logo paths]</svg>
+        <!-- ⚠ REQUIRED: inline the FULL official Red Hat logo SVG from the "Red Hat Logo" section above
+             (lines ~220–246). Use the Reverse variant (white wordmark) for dark decks, Standard (dark
+             wordmark) for light decks. DO NOT substitute a stylized approximation, silhouette-only
+             icon, text-based wordmark, or any other placeholder — use the canonical 613×145 paths. -->
+        <svg class="rh-logo small" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+          <title>Red Hat</title>
+          <!-- [INLINE the 3 paths from the Reverse OR Standard logo block above, selected by deck mode] -->
+        </svg>
         <span>› [Team / Group]</span>
       </div>
       <!-- ... rest of title slide ... -->
@@ -512,7 +520,11 @@ using design tokens for sizing, spacing, and borders:
     <div class="slide">
       <!-- ... content ... -->
       <div class="logo-footer">
-        <svg class="rh-logo large" ...>[appropriate logo paths]</svg>
+        <!-- ⚠ REQUIRED: same official SVG as above, but with class="rh-logo large" -->
+        <svg class="rh-logo large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+          <title>Red Hat</title>
+          <!-- [INLINE the 3 paths from the Reverse OR Standard logo block above, selected by deck mode] -->
+        </svg>
       </div>
     </div>
   </div>
@@ -618,6 +630,14 @@ To ensure decks work reliably everywhere, **always use the thumbnail + new-tab p
 2. On click, open the video on youtube.com in a new browser tab
 3. The presenter's slide stays visible — they can return to it after watching
 
+**Required attribute for every `.video-container`: `data-video-url="[full URL]"`**
+
+In addition to `data-video-id` (used by the click-to-play handler), every video container must
+carry `data-video-url` set to the canonical user-facing URL (e.g. `https://www.youtube.com/watch?v=VIDEO_ID`
+or the direct `.mp4` URL). The print CSS reads this attribute via `content: attr(data-video-url)`
+to render the URL as a caption beneath the poster/thumbnail in PDF export — videos can't play in
+a PDF, so readers need the link.
+
 This approach has zero dependencies on iframes, works from any protocol, and is immune to ad blockers.
 
 The thumbnail URL pattern: `https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg`
@@ -682,7 +702,9 @@ file, videos open on YouTube in a new tab instead.
 <div class="slide" data-notes="[notes]">
   <div class="slide-label animate-in">—— LABEL</div>
   <h2 class="animate-in">Headline <span class="accent">with accent</span></h2>
-  <div class="video-container animate-in" data-video-id="VIDEO_ID">
+  <div class="video-container animate-in"
+       data-video-id="VIDEO_ID"
+       data-video-url="https://www.youtube.com/watch?v=VIDEO_ID">
     <img class="video-thumbnail" src="https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg" alt="Video description">
     <div class="video-play-btn"></div>
   </div>
@@ -694,7 +716,7 @@ file, videos open on YouTube in a new tab instead.
 <div class="slide" data-notes="[notes]">
   <div class="slide-label animate-in">—— LABEL</div>
   <h2 class="animate-in">Headline <span class="accent">with accent</span></h2>
-  <div class="video-container animate-in">
+  <div class="video-container animate-in" data-video-url="https://example.com/video.mp4">
     <video controls muted preload="metadata">
       <source src="https://example.com/video.mp4" type="video/mp4">
     </video>
@@ -939,6 +961,18 @@ Include this navigation system in every deck:
     if (Math.abs(diff) > 50) { diff < 0 ? next() : prev(); }
   });
 
+  // Print / PDF export — clear JS-set inline display so all slides render in print,
+  // then restore the single-slide presenter view when the print dialog closes.
+  // See "Print / PDF Export Styles" for the matching @media print CSS.
+  window.addEventListener('beforeprint', () => {
+    slides.forEach(s => { s.style.display = ''; });
+    document.body.classList.add('printing');
+  });
+  window.addEventListener('afterprint', () => {
+    document.body.classList.remove('printing');
+    show(idx);
+  });
+
   show(0);
 })();
 ```
@@ -961,7 +995,218 @@ Use subtle entrance animations for slide content. Stagger child elements for a c
 }
 ```
 
-## Quality Checklist
+## Print / PDF Export Styles
+
+Every generated deck **must** include an `@media print` block so users can produce a clean,
+multi-page PDF via the browser's built-in `Cmd/Ctrl+P → Save as PDF`. Without these styles,
+printing captures only the first slide — because the navigation JS sets inline
+`style="display: none"` on every non-active slide, which overrides regular stylesheet rules.
+
+### The fidelity requirement (non-negotiable)
+
+**A printed PDF page must look like a shrunken on-screen slide — same headline weight, same
+bullet alignment, same card geometry, same rhythm.** The print CSS is *not* a redesign — it
+only changes what's physically required for paper (ink palette, page breaks, hidden chrome,
+disabled animations) and keeps everything else identical.
+
+Failure mode to avoid: bullets that line up at a 24px offset on screen but drift to a
+different offset in the PDF because `em`-based positioning compounded with a different font
+size computed from `clamp()` in print context. Fix: pin print typography and geometry to
+absolute `pt` values, and give each printed page a 16:9 aspect ratio so proportions match
+the screen slide.
+
+### Why this is required
+
+- The `show()` function in the navigation IIFE sets `s.style.display = 'none'` on inactive slides.
+  Print CSS must use `!important` AND the `beforeprint` listener must clear the inline styles
+  (both are needed — some browsers honor inline `display:none` even in print context).
+- On-screen layouts use `100vh` / viewport units that clip when rendered onto paper.
+- Entrance animations (`fadeSlideUp`) are triggered by the `.active` class and would leave
+  non-active slides faded/offset in print if not reset.
+- Navigation chrome (`.controls`, `.notes-panel`, `.nav-hint`) is useless in a PDF.
+- `clamp()` with `vw` resolves unpredictably in print context across browsers — always
+  override to fixed `pt` values for every typographic class used in the deck.
+
+### Required `@media print` block (include in every deck)
+
+```css
+@media print {
+  /* Custom 16:9 page — each printed page has the same aspect ratio as an on-screen slide,
+     so proportions are preserved. Chrome's "Save as PDF" respects this; users who pick a
+     physical page size in the dialog get scaled-to-fit output the browser handles. */
+  @page { size: 13.33in 7.5in; margin: 0; }
+
+  /* Preserve brand colors (red accents, logo) through print */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* Reset JS-set inline display:none and viewport-fill sizing */
+  html, body {
+    height: auto !important;
+    width: auto !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .deck {
+    height: auto !important; width: auto !important;
+    position: static !important; overflow: visible !important;
+  }
+
+  /* Each slide fills one 16:9 page. Dimensions and padding stay in physical units so
+     layout is deterministic across browsers — no viewport math in print context. */
+  .slide {
+    display: flex !important;
+    position: relative !important;
+    inset: auto !important;
+    width: 13.33in !important;
+    height: 7.5in !important;
+    padding: 0.55in 0.85in !important;
+    gap: 0.14in !important;
+    box-sizing: border-box !important;
+    break-after: page;
+    page-break-after: always;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    overflow: hidden !important;
+  }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .slide::before, .slide::after { display: none !important; }
+
+  /* Pin typography to fixed pt values — never let clamp()/vw recompute in print.
+     These numbers are scaled to fit the 13.33×7.5in page at roughly the same visual
+     proportions as a 1920×1080 on-screen slide. Tune if your deck uses a different
+     screen type scale, but keep them ABSOLUTE (pt), never relative (vw/em for clamp). */
+  .headline-xl { font-size: 60pt !important; line-height: 1.05 !important; letter-spacing: -0.02em; }
+  .headline-lg { font-size: 42pt !important; line-height: 1.05 !important; letter-spacing: -0.02em; }
+  .headline-md { font-size: 28pt !important; line-height: 1.1 !important; }
+  .subtitle, .body-text { font-size: 14pt !important; line-height: 1.45 !important; }
+  .big-number { font-size: 150pt !important; line-height: 0.9 !important; letter-spacing: -0.03em; }
+  .quote { font-size: 30pt !important; line-height: 1.2 !important; }
+  .slide-label, .breadcrumb { font-size: 10pt !important; letter-spacing: 0.1em; }
+  .attribution, .source, .nav-hint,
+  .arch-layer .arch-tag, .compare-col .lead, .proof-card .proof-title,
+  .quote-attribution, .tag { font-size: 9pt !important; }
+
+  /* Bullet geometry: pin ALL dimensions in pt so marks align identically to screen. */
+  .bullet-list { gap: 10pt !important; max-width: none !important; }
+  .bullet-list li {
+    padding-left: 18pt !important;
+    font-size: 12pt !important;
+    line-height: 1.45 !important;
+  }
+  .bullet-list li::before {
+    content: '' !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0.7em !important;
+    width: 10pt !important;
+    height: 2pt !important;
+    background: #ee0000 !important;
+    border-radius: 0 !important;
+  }
+
+  /* Cards/grids: preserve on-screen structure; just normalize padding to physical units. */
+  .compare-grid, .proof-grid { gap: 0.18in !important; }
+  .compare-col, .proof-card, .arch-layer { padding: 0.2in !important; }
+  .arch-stack { gap: 3pt !important; }
+
+  /* Breadcrumb and attribution stay absolutely positioned (same as screen) so the
+     title slide's geometry is preserved. Anchor to the 16:9 print canvas. */
+  .breadcrumb { top: 0.4in !important; left: 0.85in !important; }
+  .attribution { bottom: 0.4in !important; left: 0.85in !important; }
+
+  /* Disable entrance animations — render final state */
+  .slide .animate-in,
+  .slide.active .animate-in {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Hide presenter chrome */
+  .controls, .nav-hint, .notes-panel { display: none !important; }
+
+  /* Ambient glow / decorative backgrounds waste ink on paper */
+  .ambient-glow, .bg-glow, [class*="glow"] { display: none !important; }
+
+  /* Video slides: keep thumbnail, drop play button + iframe, show URL caption */
+  .video-container .video-play-btn,
+  .video-container .play-button,
+  .video-container iframe { display: none !important; }
+  .video-container { aspect-ratio: auto; max-height: 4.5in; }
+  .video-container img { max-height: 4.5in; object-fit: contain; }
+  .video-container[data-video-url]::after {
+    content: "▶ " attr(data-video-url);
+    display: block;
+    font-family: var(--rh-font-family-code, 'Red Hat Mono', monospace);
+    font-size: 10pt;
+    color: #6a6e73;
+    margin-top: 6pt;
+    word-break: break-all;
+  }
+
+  /* Media slides: keep images on-page */
+  .media-container { max-height: 5in !important; page-break-inside: avoid; }
+  .media-container img, .slide-media { max-height: 5in; object-fit: contain; }
+}
+```
+
+### Print Palette Override (Dark Decks Only)
+
+For Core Dark and Expressive Dark decks, remap colors to an ink-efficient light palette on
+print. Red Hat red accents are preserved. **Skip this block for Core Light decks** — their
+on-screen palette already prints well.
+
+```css
+@media print {
+  :root { color-scheme: light; }
+  body, .deck, .slide { background: #fff !important; color: #151515 !important; }
+  .headline, h1, h2, h3,
+  .headline-xl, .headline-lg, .headline-md,
+  .big-number, .quote, .stat-number { color: #151515 !important; }
+  .subtitle, .body-text, p, li, .bullet-list li, .media-caption,
+  .compare-col p, .proof-card p { color: #3c3f42 !important; }
+  /* ⚠ Bold labels inside bullets/cards — on-screen they're `var(--text-primary)` (white);
+     in print they must be dark. Forgetting this rule causes `<strong>` text to render
+     white-on-white — invisible but still occupying layout width, which looks like a
+     giant gap between the bullet dash and the visible text. Must override explicitly. */
+  .bullet-list li strong, .compare-col strong, .proof-card strong,
+  p strong, li strong { color: #151515 !important; font-weight: 700 !important; }
+  .breadcrumb, .slide-label, .nav-label, .source, .attribution,
+  .quote-attribution, .tag,
+  .arch-layer .arch-tag, .compare-col .lead, .proof-card .proof-title {
+    color: #6a6e73 !important;
+  }
+  /* Preserve Red Hat red-50 on accents */
+  .accent, .red-accent, [class*="red-50"],
+  .big-number, .compare-col.winner .lead,
+  .proof-card .proof-title { color: #ee0000 !important; }
+  /* Tag pills: dark outline on white */
+  .tag, [class*="tag"] {
+    background: transparent !important;
+    border-color: #3c3f42 !important;
+    color: #151515 !important;
+  }
+  .tag.hot, .compare-col.winner { border-color: #ee0000 !important; }
+  .compare-col, .proof-card, .arch-layer {
+    background: #fff !important;
+    border-color: #c7c7c7 !important;
+  }
+  .arch-layer.os-added {
+    border-color: #ee0000 !important;
+    background: rgba(238, 0, 0, 0.04) !important;
+  }
+  .proof-card { border-left-color: #ee0000 !important; }
+
+  /* Swap reverse (white) wordmark → dark for print. Targets the wordmark path by its
+     original fill — the canonical 613×145 logo has the wordmark as the last path with
+     fill="#fff". Fedora silhouette (fill="#e00") stays red in both modes per brand. */
+  body.printing .rh-logo path[fill="#fff"] { fill: #151515 !important; }
+}
+```
+
+If the deck uses a light mode, omit the palette override block entirely (but still include the
+base `@media print` block above).
+
 
 Before delivering the HTML file, verify:
 
@@ -970,6 +1215,7 @@ Before delivering the HTML file, verify:
 - [ ] Red-50 (#ee0000) appears on every slide (even if just in the nav or a small accent)
 - [ ] **Red Hat logo** appears on the title slide (breadcrumb area, small) and closing slide (larger)
 - [ ] Logo uses the correct variant: reverse (white wordmark) for dark, standard (black wordmark) for light
+- [ ] Logo is the **official** inline SVG from the "Red Hat Logo" section above (viewBox `0 0 613 145`, all three canonical paths) — **never** a stylized approximation, silhouette-only icon, text-in-SVG wordmark, or placeholder
 - [ ] Logo is inline SVG (no external image dependencies)
 - [ ] Color palette matches the chosen mode (Core Dark or Core Light or Expressive Dark)
 - [ ] Color contrast meets WCAG AA (4.5:1 for body text, 3:1 for large headlines)
@@ -998,6 +1244,13 @@ Before delivering the HTML file, verify:
 - [ ] The accent word(s) in the title slide headline are colored red-50 for emphasis
 - [ ] Video/media opportunities are noted in contextual notes (not inserted during initial generation)
 - [ ] **Post-generation prompt** was shown to the user after delivering the deck, offering to add videos or memes
+- [ ] `@media print` block is present and resets inline `display:none` with `!important` so all slides render in PDF export
+- [ ] Print CSS uses a **custom 16:9 page** (`@page { size: 13.33in 7.5in; margin: 0; }`), **fixed pt typography** for every class (no `clamp()`/`vw` leaking into print), and **pt-based bullet geometry** so list marks align identically to screen — the PDF must look like a shrunken on-screen slide, not a reinterpreted print view
+- [ ] `beforeprint` / `afterprint` listeners are wired in the navigation IIFE (clear inline styles before print, restore `show(idx)` after)
+- [ ] For dark-mode decks: print palette override block is included (white background, `#151515` body text, red-50 accents preserved, wordmark-path fill swapped via `body.printing .rh-logo path[fill="#fff"]`); for light-mode decks, this block is omitted
+- [ ] Print palette override remaps **`<strong>` inside bullets and cards** to `#151515` — otherwise bold labels inherit the dark-mode white and render invisibly on paper, producing a large gap before the visible bullet text
+- [ ] Every `.video-container` carries a `data-video-url` attribute so the print CSS caption renders
+- [ ] A Markdown outline companion file is saved alongside the HTML (same kebab-case filename, `.md` extension)
 
 ## Example: Mapping the OpenCode Screenshot to This System
 
@@ -1018,8 +1271,65 @@ This is the target aesthetic. Every title slide should feel this cinematic and i
 
 ## File Delivery
 
-Save the generated HTML to `/mnt/user-data/outputs/[deck-name].html` and present it to the user.
-The filename should be kebab-case derived from the deck title.
+Save **two** files per deck — both use the same kebab-case filename derived from the deck title:
+
+1. `/mnt/user-data/outputs/[deck-name].html` — the interactive, self-contained HTML deck
+2. `/mnt/user-data/outputs/[deck-name].md` — a Markdown outline companion for editable
+   leave-behinds (wiki paste, email, notes apps)
+
+Present both files to the user. Mention that the HTML can be saved as a PDF via
+`Cmd/Ctrl+P → Save as PDF` (landscape orientation), and that the `.md` file mirrors the deck
+as plain text for sharing.
+
+### Markdown Companion Format
+
+The `.md` file should mirror the deck's narrative in plain Markdown. Use this template:
+
+```markdown
+# [Deck Title]
+
+[Subtitle / tagline — optional]
+
+**[Team / Group]** · [Date]
+_Author Name · Role · Red Hat_
+
+---
+
+## Slide 1 — [Headline]
+
+[Body copy, bullets, or stat — whatever is on the slide, rendered as Markdown]
+
+- Bullet one
+- Bullet two
+
+> Contextual notes: [the contents of `data-notes` for this slide, including references and links]
+
+**Source:** [source attribution if present]
+
+---
+
+## Slide 2 — [Headline]
+
+[...]
+
+---
+
+## Slide N — Thank You
+
+Author Name · Role · Red Hat
+[Contact info if present]
+```
+
+**Guidelines for the Markdown companion:**
+
+- One `## Slide N — Headline` per slide, in order.
+- Preserve accent words as emphasis (`*word*` or `**word**`), not HTML.
+- For **video slides**, include the video URL as a plain link: `[Watch video](URL)`.
+- For **media/meme slides**, include the image URL (or note `[local image: filename]` for base64).
+- For **big-number/stat slides**, render as `**42M**` followed by the supporting text.
+- For **quote slides**, use a blockquote: `> "Quote text" — Attribution`.
+- Include `data-notes` content under each slide as a blockquote labeled `> Contextual notes:`.
+- Do **not** try to reproduce HTML styling; the Markdown is for plain-text readability.
 
 ## Post-Generation: Video & Media Placement
 
