@@ -1116,7 +1116,23 @@ the screen slide.
 ### Required `@media print` block (include in every deck)
 
 ```css
+/* Print preview hygiene — outside any @media block so it applies in screen context.
+   While the print dialog is open, the JS beforeprint handler clears each slide's
+   inline display:none and sets display:flex on every slide so the auto-fit
+   measurement pass works. In the visible viewport behind the dialog this paints
+   all 14 (or N) slides on top of each other (they share `position:absolute;
+   inset:0;`). The PDF render is unaffected — but the screen view looks like a
+   jumbled overlap. Hiding the deck while body.printing is set keeps the visible
+   viewport clean; the @media print rule below restores it for the actual page render. */
+body.printing .deck { visibility: hidden; }
+
 @media print {
+  /* Restore visibility for the actual print render. body.printing is still set
+     during the print pass, but here we're in print context (not screen), and the
+     !important re-show overrides the screen-only rule above. */
+  body.printing .deck,
+  body.printing .slide { visibility: visible !important; }
+
   /* Custom 16:9 page — each printed page has the same aspect ratio as an on-screen slide,
      so proportions are preserved. Chrome's "Save as PDF" respects this; users who pick a
      physical page size in the dialog get scaled-to-fit output the browser handles. */
@@ -1314,7 +1330,20 @@ Watch for them when authoring or editing slide CSS:
    `scrollHeight` measurement matches `clientHeight`, the auto-fit scaler doesn't
    trigger, and individual elements (especially `.code-block`) clip their own content.
 
-4. **Print Palette Override that forgets `h4`, stat descriptors, or the closer name.**
+4. **No print-preview hygiene — visible viewport jumbles all slides during print dialog.**
+   When the user opens the print dialog, the JS `beforeprint` handler clears each
+   slide's inline `display:none` and sets `display:flex` on every slide so the auto-fit
+   measurement pass works. In the **visible viewport behind the dialog**, this paints
+   all N slides on top of each other at the same `position:absolute; inset:0;`
+   coordinates — text from every slide visibly overlaps. The PDF preview pane and the
+   final PDF are correct; only the dimmed page behind the dialog looks like a jumbled
+   mess. Add this rule outside any `@media` block: `body.printing .deck { visibility:
+   hidden; }`, plus a matching `@media print { body.printing .deck, body.printing
+   .slide { visibility: visible !important; } }` to restore the deck for the actual
+   print render. Without these, every print dialog opens to a chaotic-looking page
+   behind it — users may think the deck is broken.
+
+5. **Print Palette Override that forgets `h4`, stat descriptors, or the closer name.**
    For Dark+Print decks, the override remaps `.text-primary` (white) elements to dark
    and `.text-secondary` (light gray) elements to muted dark. The trap: it's easy to
    list `h1, h2, h3` and miss `h4` (used by `.arch-layer` headers in stack slides),
