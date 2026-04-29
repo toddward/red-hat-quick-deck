@@ -1314,6 +1314,18 @@ Watch for them when authoring or editing slide CSS:
    `scrollHeight` measurement matches `clientHeight`, the auto-fit scaler doesn't
    trigger, and individual elements (especially `.code-block`) clip their own content.
 
+4. **Print Palette Override that forgets `h4`, stat descriptors, or the closer name.**
+   For Dark+Print decks, the override remaps `.text-primary` (white) elements to dark
+   and `.text-secondary` (light gray) elements to muted dark. The trap: it's easy to
+   list `h1, h2, h3` and miss `h4` (used by `.arch-layer` headers in stack slides),
+   `.compare-col h3` (card titles, technically caught by the `h3` selector but worth
+   listing explicitly), `.thank-you-slide .author-block .name` (the presenter's name on
+   the closer), `.big-number-context` (stat descriptors), and `.arch-layer p` (stack
+   body text). When any of these is forgotten, the affected text renders white-on-white
+   in the printed PDF — invisible to the reader, undetectable on a screen review.
+   **Audit the override every time you add a new component class that uses
+   `var(--text-primary)` or `var(--text-secondary)`.**
+
 ### Print Palette Override (Dark Decks + Print Intent Only)
 
 This block is **conditional** — include it only when **both** of these are true:
@@ -1335,16 +1347,32 @@ while preserving Red Hat red accents.
 @media print {
   :root { color-scheme: light; }
   body, .deck, .slide { background: #fff !important; color: #151515 !important; }
-  .headline, h1, h2, h3,
+  /* ⚠ Every element with on-screen `color: var(--text-primary)` (white) MUST be listed
+     here, otherwise it renders white-on-white in print. Easy to miss: h4 (used by
+     .arch-layer headers), .compare-col h3, .thank-you-slide .author-block .name. If
+     you add a new component that renders headline-style text, add its selector here. */
+  .headline, h1, h2, h3, h4,
   .headline-xl, .headline-lg, .headline-md,
-  .big-number, .quote, .stat-number { color: #151515 !important; }
+  .big-number, .quote, .stat-number,
+  .arch-layer h4,
+  .compare-col h3, .proof-card h4,
+  .thank-you-slide .author-block .name { color: #151515 !important; }
+  /* ⚠ Same trap one shade lighter — anything that uses `var(--text-secondary)` (light
+     gray) on screen renders as nearly-invisible light gray on white in print unless
+     remapped here. Includes .big-number-context (stat descriptors), .arch-layer p
+     (stack body text), and .thank-you-slide .author-block (closer subtitle). */
   .subtitle, .body-text, p, li, .bullet-list li, .media-caption,
-  .compare-col p, .proof-card p { color: #3c3f42 !important; }
+  .compare-col p, .proof-card p,
+  .arch-layer p,
+  .big-number-context,
+  .thank-you-slide .author-block,
+  .thank-you-slide .author-block div { color: #3c3f42 !important; }
   /* ⚠ Bold labels inside bullets/cards — on-screen they're `var(--text-primary)` (white);
      in print they must be dark. Forgetting this rule causes `<strong>` text to render
      white-on-white — invisible but still occupying layout width, which looks like a
      giant gap between the bullet dash and the visible text. Must override explicitly. */
   .bullet-list li strong, .compare-col strong, .proof-card strong,
+  .big-number-context strong,
   p strong, li strong { color: #151515 !important; font-weight: 700 !important; }
   .breadcrumb, .slide-label, .nav-label, .source, .attribution,
   .quote-attribution, .tag,
