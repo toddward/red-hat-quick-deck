@@ -43,6 +43,33 @@ The skill will ask your preferred visual mode (dark/light), research the topic i
 
 Title, Content, Big Number/Stat, Comparison, Architecture Diagram, Quote, Call-to-Action, and Thank You slides — all styled to Red Hat brand standards.
 
+## Exporting as PDF or Markdown
+
+Decks are primarily interactive HTML, but you can hand someone a PDF leave-behind or a plain-text outline without any extra tooling.
+
+### Save as PDF (browser-native)
+
+1. Open the `.html` file in any modern browser.
+2. Press `Cmd+P` (macOS) or `Ctrl+P` (Windows/Linux).
+3. Set **Destination: Save as PDF**, **Layout: Landscape**, **Margins: Default**.
+4. Save.
+
+Every slide renders on its own page, navigation chrome is hidden, and entrance animations are flattened. **Dark-mode decks automatically switch to a light, ink-efficient palette for print** — Red Hat red accents are preserved. Light-mode decks print as-is.
+
+Video slides render as the poster/thumbnail with the video URL printed as a caption underneath (PDFs can't play video).
+
+### Markdown companion
+
+Every generated deck is also saved as a `.md` outline next to the `.html`, using the same filename. The Markdown file mirrors the deck's narrative — headlines, bullets, stats, quotes, video links, and contextual notes — in plain text. Useful for:
+
+- Pasting into a wiki or Notion page
+- Copying into an email recap
+- Keeping an editable record of the deck
+
+### What's not (yet) exported
+
+No PPTX export. PowerPoint would require a runtime dependency; the PDF + Markdown combo covers the common "leave-behind" use cases without adding weight to the skill.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE). You are free to use, modify, and distribute this project. The original author, Todd Wardzinski, kindly asks that you provide attribution back to this project when using or redistributing it.
