@@ -16,6 +16,13 @@ Generate a deck whenever the user asks for a slide deck, presentation, quick dec
    - **Dark mode** (cinematic, dark backgrounds — best for screens & presenting)
    - **Light mode** (clean, white backgrounds — best for print & email sharing)
    - Default to **Dark mode** if the user doesn't specify.
+2. **Ask the user about PDF export intent** — this gets baked into the deck's `@media print` CSS at generation time, so it must be decided up front:
+   - **Digital sharing** (email, Slack, viewing on screens — keep the on-screen palette in the PDF)
+   - **Print** (physical paper or ink-efficient PDF — force a white background with dark text)
+   - Default to **Digital sharing** if the user doesn't specify.
+   - This only changes the PDF for Dark / Expressive Dark decks. Light decks always print on white.
+   - Dark deck + Digital sharing → **omit** the Print Palette Override block; the PDF stays dark.
+   - Dark deck + Print → **include** the Print Palette Override block; the PDF uses an ink-efficient white palette.
 
 ## What You Produce
 
@@ -529,13 +536,53 @@ Include this in every deck:
   });
 
   // Print / PDF export — clear JS-set inline display so all slides render in print,
-  // then restore the single-slide presenter view when the print dialog closes.
+  // auto-fit any slide whose content overflows the 7.5in print page, and restore
+  // the presenter view when the dialog closes. Slides that already fit print at
+  // exact 1:1 fidelity; only overflow slides scale to fit.
   window.addEventListener('beforeprint', () => {
     slides.forEach(s => { s.style.display = ''; });
     document.body.classList.add('printing');
+
+    slides.forEach(s => {
+      let fit = s.querySelector(':scope > .slide-fit');
+      if (!fit) {
+        fit = document.createElement('div');
+        fit.className = 'slide-fit';
+        while (s.firstChild) fit.appendChild(s.firstChild);
+        s.appendChild(fit);
+      }
+      fit.style.cssText =
+        'display:flex;flex-direction:column;width:100%;height:100%;' +
+        'transform-origin:top left;transform:none;';
+
+      s._priorStyle = s.style.cssText;
+      s.style.cssText +=
+        ';display:flex !important;width:13.33in !important;height:7.5in !important;' +
+        'padding:0.55in 0.85in !important;box-sizing:border-box !important;' +
+        'overflow:hidden !important;';
+
+      const cw = fit.clientWidth, ch = fit.clientHeight;
+      const sw = fit.scrollWidth, sh = fit.scrollHeight;
+      if (sw > cw + 1 || sh > ch + 1) {
+        const k = Math.min(cw / sw, ch / sh);
+        fit.style.width  = (cw / k) + 'px';
+        fit.style.height = (ch / k) + 'px';
+        fit.style.transform = 'scale(' + k + ')';
+        fit.dataset.fitScale = k.toFixed(3);
+      }
+    });
   });
   window.addEventListener('afterprint', () => {
     document.body.classList.remove('printing');
+    document.querySelectorAll('.slide > .slide-fit').forEach(fit => {
+      const s = fit.parentElement;
+      while (fit.firstChild) s.appendChild(fit.firstChild);
+      fit.remove();
+      if (s._priorStyle !== undefined) {
+        s.style.cssText = s._priorStyle;
+        delete s._priorStyle;
+      }
+    });
     show(idx);
   });
 
@@ -674,10 +721,41 @@ aspect ratio so proportions match the screen slide.
 }
 ```
 
-### Print Palette Override (Dark Decks Only)
+### Print fit budget — what fits on a 7.5in page
 
-For Core Dark / Expressive Dark decks, also emit this block so printed output is ink-efficient.
-Omit it for Core Light decks.
+A 7.5in print page is a hard ceiling — content taller than that gets clipped silently
+without the auto-fit safety net. The `beforeprint` handler in the navigation IIFE wraps
+each slide in a `.slide-fit` div, measures it, and applies `transform: scale()` only
+when the content overflows. Slides that already fit print at exact 1:1 fidelity. Author
+slides to fit 1:1; the auto-fit pass is a safety net, not a license to over-pack.
+
+Per-pattern budgets:
+
+- **Stacked architecture layers (`.arch-stack`)** — max **4** layer cards if the slide
+  also has a title + intro paragraph. **5+ layers → split into two slides** or drop the
+  intro.
+- **Bullet list** — max **6** bullets at 12pt body. 7+ → split or condense to one-line bullets.
+- **Compare grid (`.compare-col`) / proof grid** — max **4** items per column with a title + intro.
+- **Code blocks** — max **18 lines** of YAML/code at default font. Longer → trim or continue on next slide.
+- **Big-number slide** — max **2** numbers per slide. 3+ → split.
+- **Body paragraph** — max ~**280 characters** above stacked cards or grids; ~450 if no other content below.
+
+When in doubt, split. Two clean slides read better than one auto-shrunk slide where the
+typography is visibly smaller than its neighbors.
+
+### Print Palette Override (Dark Decks + Print Intent Only)
+
+Emit this block **only** when the deck is Core Dark or Expressive Dark **and** the user chose
+**Print** as the PDF export intent. Skip it when:
+
+- The deck is Core Light, OR
+- The deck is Dark but the user chose **Digital sharing** — the PDF should preserve the
+  cinematic dark palette so it matches the on-screen experience.
+
+When skipping for a dark deck with Digital-sharing intent, also remove the
+`background: #fff !important;` declarations on `html, body` and `.deck` from the base print
+block above (replace with the dark `--bg-primary` value) so the dark backdrop carries into
+the PDF.
 
 ```css
 @media print {
@@ -760,6 +838,8 @@ as plain links, and each slide's contextual notes under `> Contextual notes:`.
 
 Before delivering, verify:
 - [ ] User was asked about dark or light mode
+- [ ] User was asked about PDF export intent (digital sharing vs print), and the print CSS reflects their choice
+- [ ] **Print fit verified** — opened the deck in a browser, triggered `Cmd/Ctrl+P → Save as PDF`, and visually scanned the preview pane for any slide where the headline, last bullet, last card, or last code line is clipped. The auto-fit JS scales overflow slides to fit; if any slide scales below ~80% (typography reads smaller than neighbors), the content is over-budget per "Print fit budget" and should be split
 - [ ] All text uses Red Hat font family (Display, Text, or Mono)
 - [ ] Red-50 (#ee0000) appears on every slide (even if just in nav)
 - [ ] Red Hat logo on title slide (breadcrumb, small) and closing slide (larger)

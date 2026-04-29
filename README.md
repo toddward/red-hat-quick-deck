@@ -37,7 +37,7 @@ Install the skill in Claude Code, then ask for a presentation:
 - "Make me a presentation on AI at the edge for Red Hat"
 - "Build a pitch deck about OpenShift for enterprise architects"
 
-The skill will ask your preferred visual mode (dark/light), research the topic if web search is available, choose a story arc, and generate a complete HTML slide deck.
+The skill will ask your preferred visual mode (dark/light), ask whether any PDF export will be used for digital sharing or for print, research the topic if web search is available, choose a story arc, and generate a complete HTML slide deck.
 
 ## Slide Types
 
@@ -54,7 +54,12 @@ Decks are primarily interactive HTML, but you can hand someone a PDF leave-behin
 3. Set **Destination: Save as PDF**, **Layout: Landscape**, **Margins: Default**.
 4. Save.
 
-Every slide renders on its own page, navigation chrome is hidden, and entrance animations are flattened. **Dark-mode decks automatically switch to a light, ink-efficient palette for print** — Red Hat red accents are preserved. Light-mode decks print as-is.
+Every slide renders on its own page, navigation chrome is hidden, and entrance animations are flattened. The PDF palette depends on the **PDF export intent** you chose at deck generation:
+
+- **Digital sharing** (default): the PDF preserves the on-screen palette — dark decks stay dark, light decks stay light. Best when the PDF will be emailed, shared in Slack, or viewed on a screen.
+- **Print**: dark decks switch to a light, ink-efficient palette (white background, dark text, preserved Red Hat red accents) so the deck reads well on paper or in a doc bundle. Light decks print as-is in either intent.
+
+If you need both flavors, regenerate the deck — the choice is baked into the deck's print CSS at creation time.
 
 Video slides render as the poster/thumbnail with the video URL printed as a caption underneath (PDFs can't play video).
 

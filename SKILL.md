@@ -27,6 +27,13 @@ narrative story arcs to make technical content compelling and memorable.
    - Question: "What visual mode should this deck use?"
    - Options: "Dark mode (cinematic, dark backgrounds — best for screens & presenting)", "Light mode (clean, white backgrounds — best for print & email sharing)"
    - Default to **Dark mode** if the user doesn't specify or says "either" or "don't care."
+5. **Ask the user about PDF export intent** — this determines what the printed PDF looks like and is baked into the deck's `@media print` CSS, so it must be decided before generation:
+   - Question: "If/when this deck is exported as a PDF, how will it primarily be used?"
+   - Options: "Digital sharing (email, Slack, viewing on screens — keep the on-screen palette in the PDF)", "Print (physical paper or ink-efficient PDF — force a white background with dark text)"
+   - Default to **Digital sharing** if the user doesn't specify.
+   - This only changes behavior for **Dark** and **Expressive Dark** decks. Light decks already print on white regardless of intent.
+   - For Dark decks + Digital sharing → **omit** the Print Palette Override block. The PDF preserves the dark cinematic palette.
+   - For Dark decks + Print → **include** the Print Palette Override block. The PDF remaps to white background with dark text and preserved Red Hat red accents.
 
 ## What This Skill Produces
 
@@ -962,14 +969,85 @@ Include this navigation system in every deck:
   });
 
   // Print / PDF export — clear JS-set inline display so all slides render in print,
-  // then restore the single-slide presenter view when the print dialog closes.
-  // See "Print / PDF Export Styles" for the matching @media print CSS.
+  // auto-fit any slide whose content would overflow the 7.5in print page, and
+  // restore the presenter view when the dialog closes. The fit pass measures each
+  // slide against print geometry and scales only the slides that need it; slides
+  // that already fit print at exact 1:1 fidelity. See "Print / PDF Export Styles"
+  // for the matching @media print CSS.
   window.addEventListener('beforeprint', () => {
     slides.forEach(s => { s.style.display = ''; });
     document.body.classList.add('printing');
+
+    slides.forEach(s => {
+      // Wrap children once (idempotent across repeat prints). The wrapper is a flex
+      // container that MIRRORS the slide's own flex layout (justify-content,
+      // align-items, text-align, gap) so vertical/horizontal centering and the
+      // .thank-you-slide centering rule survive the wrap. Without this mirror,
+      // the slide's `justify-content: center` is silently lost and content
+      // top-anchors — which collides with absolutely-positioned eyebrow/breadcrumb
+      // elements on the title slide and breaks the closer slide's centering.
+      let fit = s.querySelector(':scope > .slide-fit');
+      if (!fit) {
+        fit = document.createElement('div');
+        fit.className = 'slide-fit';
+        while (s.firstChild) fit.appendChild(s.firstChild);
+        s.appendChild(fit);
+      }
+      const cs = window.getComputedStyle(s);
+      fit.style.cssText =
+        'display:flex;width:100%;height:100%;' +
+        'flex-direction:' + (cs.flexDirection || 'column') + ';' +
+        'justify-content:' + (cs.justifyContent || 'center') + ';' +
+        'align-items:' + (cs.alignItems || 'stretch') + ';' +
+        'text-align:' + (cs.textAlign || 'left') + ';' +
+        'gap:' + (cs.gap || '0') + ';' +
+        'transform-origin:top left;transform:none;';
+      // Lock children against flex-shrink so scrollHeight reflects true content
+      // size — otherwise items silently shrink and clip their own content (e.g.
+      // a code-block losing its last line of YAML, with no auto-fit triggered).
+      for (let i = 0; i < fit.children.length; i++) {
+        fit.children[i].style.flexShrink = '0';
+      }
+
+      // Pin slide to print geometry inline so clientWidth/Height reflect the print
+      // page even before the browser fully applies @media print rules.
+      s._priorStyle = s.style.cssText;
+      s.style.cssText +=
+        ';display:flex !important;width:13.33in !important;height:7.5in !important;' +
+        'padding:0.55in 0.85in !important;box-sizing:border-box !important;' +
+        'overflow:hidden !important;';
+
+      // Measure content vs available area; scale down only if it overflows.
+      const cw = fit.clientWidth, ch = fit.clientHeight;
+      const sw = fit.scrollWidth, sh = fit.scrollHeight;
+      if (sw > cw + 1 || sh > ch + 1) {
+        const k = Math.min(cw / sw, ch / sh);
+        fit.style.width  = (cw / k) + 'px';
+        fit.style.height = (ch / k) + 'px';
+        fit.style.transform = 'scale(' + k + ')';
+        fit.dataset.fitScale = k.toFixed(3);
+      }
+    });
   });
   window.addEventListener('afterprint', () => {
     document.body.classList.remove('printing');
+    // Unwrap auto-fit containers and restore inline styles so on-screen
+    // navigation/animation behavior is unchanged.
+    document.querySelectorAll('.slide > .slide-fit').forEach(fit => {
+      const s = fit.parentElement;
+      while (fit.firstChild) {
+        const child = fit.firstChild;
+        // Clear the flex-shrink we set during beforeprint so screen layout
+        // returns to default flex behavior.
+        if (child.style && child.style.flexShrink) child.style.flexShrink = '';
+        s.appendChild(child);
+      }
+      fit.remove();
+      if (s._priorStyle !== undefined) {
+        s.style.cssText = s._priorStyle;
+        delete s._priorStyle;
+      }
+    });
     show(idx);
   });
 
@@ -1026,11 +1104,35 @@ the screen slide.
 - Navigation chrome (`.controls`, `.notes-panel`, `.nav-hint`) is useless in a PDF.
 - `clamp()` with `vw` resolves unpredictably in print context across browsers — always
   override to fixed `pt` values for every typographic class used in the deck.
+- A 7.5in print page is a hard ceiling — content taller than that gets clipped silently
+  (the screenshot shows the title chopped at the top *and* the last layer chopped at the
+  bottom of the same slide, because the slide centers content vertically and overflows
+  in both directions). The navigation IIFE includes a `beforeprint` auto-fit pass that
+  wraps each slide's children in a `.slide-fit` div, measures it against the print page,
+  and applies `transform: scale()` only if the content overflows. Slides that already fit
+  print at exact 1:1 fidelity. This is a safety net — it does not replace the authoring
+  density budgets below.
 
 ### Required `@media print` block (include in every deck)
 
 ```css
+/* Print preview hygiene — outside any @media block so it applies in screen context.
+   While the print dialog is open, the JS beforeprint handler clears each slide's
+   inline display:none and sets display:flex on every slide so the auto-fit
+   measurement pass works. In the visible viewport behind the dialog this paints
+   all 14 (or N) slides on top of each other (they share `position:absolute;
+   inset:0;`). The PDF render is unaffected — but the screen view looks like a
+   jumbled overlap. Hiding the deck while body.printing is set keeps the visible
+   viewport clean; the @media print rule below restores it for the actual page render. */
+body.printing .deck { visibility: hidden; }
+
 @media print {
+  /* Restore visibility for the actual print render. body.printing is still set
+     during the print pass, but here we're in print context (not screen), and the
+     !important re-show overrides the screen-only rule above. */
+  body.printing .deck,
+  body.printing .slide { visibility: visible !important; }
+
   /* Custom 16:9 page — each printed page has the same aspect ratio as an on-screen slide,
      so proportions are preserved. Chrome's "Save as PDF" respects this; users who pick a
      physical page size in the dialog get scaled-to-fit output the browser handles. */
@@ -1106,8 +1208,28 @@ the screen slide.
 
   /* Cards/grids: preserve on-screen structure; just normalize padding to physical units. */
   .compare-grid, .proof-grid { gap: 0.18in !important; }
-  .compare-col, .proof-card, .arch-layer { padding: 0.2in !important; }
-  .arch-stack { gap: 3pt !important; }
+  .compare-col, .proof-card { padding: 0.2in !important; }
+  /* Stack-layer slides pack a lot of vertical content (5 layers + 4 arrows + headline +
+     body) — give them tighter padding/leading so the auto-fit scaler isn't forced to
+     shrink the type below ~80% to make room. */
+  .arch-layer { padding: 0.12in 0.2in !important; }
+  .arch-stack { gap: 2pt !important; margin-top: 0.1in !important; }
+  .arch-layer .arch-tag { margin-bottom: 0 !important; }
+  .arch-layer h4 { font-size: 11pt !important; line-height: 1.15 !important; margin-bottom: 2pt !important; }
+  .arch-layer p { font-size: 9pt !important; line-height: 1.3 !important; }
+  .arch-arrow { font-size: 11pt !important; line-height: 1 !important; }
+
+  /* Code blocks: in print, force overflow:visible. The on-screen rule uses
+     overflow:hidden (NEVER overflow-x:auto — per CSS spec, an `auto` on one axis
+     forces the other to `auto` as well, and the resulting overflow-y:auto silently
+     clips the bottom YAML line on tall code samples). Tighter line-height fits more
+     lines per slide before the auto-fit scaler kicks in. */
+  .code-block {
+    font-size: 9pt !important;
+    line-height: 1.45 !important;
+    padding: 0.16in !important;
+    overflow: visible !important;
+  }
 
   /* Breadcrumb and attribution stay absolutely positioned (same as screen) so the
      title slide's geometry is preserved. Anchor to the 16:9 print canvas. */
@@ -1150,26 +1272,136 @@ the screen slide.
 }
 ```
 
-### Print Palette Override (Dark Decks Only)
+### Print fit budget — what fits on a 7.5in page
 
-For Core Dark and Expressive Dark decks, remap colors to an ink-efficient light palette on
-print. Red Hat red accents are preserved. **Skip this block for Core Light decks** — their
-on-screen palette already prints well.
+The auto-fit JS in the navigation IIFE will scale any slide that overflows so nothing
+clips, but a slide that has to scale below ~80% looks visibly smaller than its neighbors
+in the PDF — the typography reads as off-rhythm, even though no content is lost. Author
+slides to fit 1:1, and split when in doubt. Use these per-pattern budgets:
+
+- **Stacked architecture layers (`.arch-stack`)** — max **4** layer cards if the slide
+  also has a title + intro paragraph. **5+ layers → split into two slides** (e.g.,
+  "Layers 1–3" / "Layers 4–5") **or** drop the intro paragraph and use a tighter
+  one-line lead-in.
+- **Bullet list** — max **6** bullets at default 12pt body. 7+ → split, or condense to
+  one-line bullets.
+- **Compare grid (`.compare-col`)**, **proof grid (`.proof-grid`)** — max **4** items per
+  column when the slide also has a title + intro paragraph.
+- **Code blocks** — max **18 lines** of YAML/code at default font. Longer → trim to the
+  relevant section (use `...` for elided fields), or use a continuation slide for the
+  remainder.
+- **Big-number slide (`.big-number`)** — max **2** numbers per slide. 3+ → split.
+- **Body paragraph** — max ~**280 characters** (≈ 3 lines at print width) above stacked
+  cards or grids; up to ~450 characters if no other content sits below.
+
+When a slide has both a title + intro + dense visual element (stack, grid, code, or
+multiple big numbers), prefer splitting over compressing. Two clean slides read better
+in the PDF than one auto-shrunk slide.
+
+### Layout pitfalls — three traps that look fine on screen but break in PDF
+
+These three CSS patterns will pass on-screen review and silently break the PDF export.
+Watch for them when authoring or editing slide CSS:
+
+1. **Stat-row `align-items: baseline` with a giant numeral.** A 130pt+ digit paired with
+   a 9–14pt descriptor on `align-items: baseline` puts the descriptor at the typographic
+   baseline of the digit — i.e., visually pinned to the bottom edge of the numeral, with
+   ~80% of the numeral's vertical area as empty space above. **Use `align-items: center`**
+   for any stat row where the figure and descriptor differ in size by more than ~3×.
+
+2. **`.code-block { overflow-x: auto; }`.** Per the CSS spec, setting one overflow axis
+   to `auto` forces the other axis to `auto` too. The result: a tall YAML sample with
+   ~18+ lines will silently get its bottom line clipped at the box edge in print, even
+   though the content is visible on screen (where scrollbars solve it). **Use
+   `overflow: hidden`** for the on-screen rule and `overflow: visible !important` in
+   `@media print`. The `.slide` already has `overflow: hidden`, which clips any
+   horizontal long-line escapes at the slide boundary instead.
+
+3. **Auto-fit `.slide-fit` wrapper that doesn't mirror the slide's flex layout.** The
+   `beforeprint` handler wraps each slide's children so they can be measured and
+   transform-scaled. If the wrapper uses a generic `display:flex; flex-direction:column;`
+   without copying the slide's `justify-content` / `align-items` / `text-align` /
+   `gap`, the slide's `justify-content: center` and the `.thank-you-slide`
+   centering rules silently disappear — content top-anchors, the title slide's
+   slide-label collides with the absolutely-positioned breadcrumb, and the closer
+   slide's "Thank You" sits at the top of an otherwise empty page. **Always read the
+   slide's computed style and mirror its flex properties onto the wrapper.** Also set
+   `flex-shrink: 0` on every wrapped child — otherwise items silently shrink, the
+   `scrollHeight` measurement matches `clientHeight`, the auto-fit scaler doesn't
+   trigger, and individual elements (especially `.code-block`) clip their own content.
+
+4. **No print-preview hygiene — visible viewport jumbles all slides during print dialog.**
+   When the user opens the print dialog, the JS `beforeprint` handler clears each
+   slide's inline `display:none` and sets `display:flex` on every slide so the auto-fit
+   measurement pass works. In the **visible viewport behind the dialog**, this paints
+   all N slides on top of each other at the same `position:absolute; inset:0;`
+   coordinates — text from every slide visibly overlaps. The PDF preview pane and the
+   final PDF are correct; only the dimmed page behind the dialog looks like a jumbled
+   mess. Add this rule outside any `@media` block: `body.printing .deck { visibility:
+   hidden; }`, plus a matching `@media print { body.printing .deck, body.printing
+   .slide { visibility: visible !important; } }` to restore the deck for the actual
+   print render. Without these, every print dialog opens to a chaotic-looking page
+   behind it — users may think the deck is broken.
+
+5. **Print Palette Override that forgets `h4`, stat descriptors, or the closer name.**
+   For Dark+Print decks, the override remaps `.text-primary` (white) elements to dark
+   and `.text-secondary` (light gray) elements to muted dark. The trap: it's easy to
+   list `h1, h2, h3` and miss `h4` (used by `.arch-layer` headers in stack slides),
+   `.compare-col h3` (card titles, technically caught by the `h3` selector but worth
+   listing explicitly), `.thank-you-slide .author-block .name` (the presenter's name on
+   the closer), `.big-number-context` (stat descriptors), and `.arch-layer p` (stack
+   body text). When any of these is forgotten, the affected text renders white-on-white
+   in the printed PDF — invisible to the reader, undetectable on a screen review.
+   **Audit the override every time you add a new component class that uses
+   `var(--text-primary)` or `var(--text-secondary)`.**
+
+### Print Palette Override (Dark Decks + Print Intent Only)
+
+This block is **conditional** — include it only when **both** of these are true:
+
+1. The deck uses Core Dark or Expressive Dark mode, AND
+2. The user said the PDF export is for **Print** (see Step 5 of "Before You Begin")
+
+When included, it remaps the printed output to an ink-efficient white-on-dark-text palette
+while preserving Red Hat red accents.
+
+**Skip this block when:**
+
+- The deck is Core Light (on-screen palette already prints well), OR
+- The deck is Dark **and** the user said the PDF is for **Digital sharing** — in that case
+  the PDF should preserve the cinematic dark palette so it matches the on-screen experience
+  when viewed in email, Slack, or a PDF reader on a screen.
 
 ```css
 @media print {
   :root { color-scheme: light; }
   body, .deck, .slide { background: #fff !important; color: #151515 !important; }
-  .headline, h1, h2, h3,
+  /* ⚠ Every element with on-screen `color: var(--text-primary)` (white) MUST be listed
+     here, otherwise it renders white-on-white in print. Easy to miss: h4 (used by
+     .arch-layer headers), .compare-col h3, .thank-you-slide .author-block .name. If
+     you add a new component that renders headline-style text, add its selector here. */
+  .headline, h1, h2, h3, h4,
   .headline-xl, .headline-lg, .headline-md,
-  .big-number, .quote, .stat-number { color: #151515 !important; }
+  .big-number, .quote, .stat-number,
+  .arch-layer h4,
+  .compare-col h3, .proof-card h4,
+  .thank-you-slide .author-block .name { color: #151515 !important; }
+  /* ⚠ Same trap one shade lighter — anything that uses `var(--text-secondary)` (light
+     gray) on screen renders as nearly-invisible light gray on white in print unless
+     remapped here. Includes .big-number-context (stat descriptors), .arch-layer p
+     (stack body text), and .thank-you-slide .author-block (closer subtitle). */
   .subtitle, .body-text, p, li, .bullet-list li, .media-caption,
-  .compare-col p, .proof-card p { color: #3c3f42 !important; }
+  .compare-col p, .proof-card p,
+  .arch-layer p,
+  .big-number-context,
+  .thank-you-slide .author-block,
+  .thank-you-slide .author-block div { color: #3c3f42 !important; }
   /* ⚠ Bold labels inside bullets/cards — on-screen they're `var(--text-primary)` (white);
      in print they must be dark. Forgetting this rule causes `<strong>` text to render
      white-on-white — invisible but still occupying layout width, which looks like a
      giant gap between the bullet dash and the visible text. Must override explicitly. */
   .bullet-list li strong, .compare-col strong, .proof-card strong,
+  .big-number-context strong,
   p strong, li strong { color: #151515 !important; font-weight: 700 !important; }
   .breadcrumb, .slide-label, .nav-label, .source, .attribution,
   .quote-attribution, .tag,
@@ -1204,13 +1436,22 @@ on-screen palette already prints well.
 }
 ```
 
-If the deck uses a light mode, omit the palette override block entirely (but still include the
-base `@media print` block above).
+If the deck uses a light mode, **or** if the deck is dark but the user chose Digital sharing
+as the PDF intent, omit the palette override block entirely (but still include the base
+`@media print` block above — slide pagination, hidden chrome, and pinned typography are
+required regardless of palette).
+
+For dark decks with Digital-sharing intent, you also need to drop the `background: #fff !important;`
+declarations on `html, body` and `.deck` from the base print block above so the dark backdrop
+carries through to the PDF. Replace those `#fff` values with `var(--bg-primary)` (or the
+equivalent dark hex) so the PDF reads as a faithful screen capture.
 
 
 Before delivering the HTML file, verify:
 
 - [ ] **User was asked** about dark or light mode preference before generation
+- [ ] **User was asked** about PDF export intent (digital sharing vs print) before generation, and the print CSS reflects their choice
+- [ ] **Print fit verified** — opened the deck in a browser, triggered `Cmd/Ctrl+P → Save as PDF`, and visually scanned the preview pane for any slide where the headline, last bullet, last card, or last code line is clipped. The auto-fit JS will scale overflow slides to fit; if any slide scales below ~80% (look for typography that reads visibly smaller than neighbors), the content is over-budget and should be split per "Print fit budget"
 - [ ] All text uses Red Hat font family (Display, Text, or Mono)
 - [ ] Red-50 (#ee0000) appears on every slide (even if just in the nav or a small accent)
 - [ ] **Red Hat logo** appears on the title slide (breadcrumb area, small) and closing slide (larger)
