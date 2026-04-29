@@ -1,6 +1,6 @@
 # Red Hat Quick Deck
 
-An [Agent Skill](https://github.com/anthropics/agent-skill) that generates stunning, self-contained HTML slide presentations styled to Red Hat brand standards. Ask for a "quick deck" on any topic and get a single `.html` file you can open in any browser, email, or host anywhere. Works in Claude Code, Cursor, OpenCode, and anything else that supports the Agent Skills open standard.
+An [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview) that generates stunning, self-contained HTML slide presentations styled to Red Hat brand standards. Ask for a "quick deck" on any topic and get a single `.html` file you can open in any browser, email, or host anywhere. Works in Claude Code, Cursor, OpenCode, and anything else that supports the Agent Skills open standard.
 
 ## What It Does
 
