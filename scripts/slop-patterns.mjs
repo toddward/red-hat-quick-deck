@@ -15,8 +15,8 @@ export const patterns = [
   // Business jargon / buzzwords (almost always slop).
   { id: 'jargon-leverage',      regex: /\bleverage\b/i,                severity: 'error', message: 'Buzzword "leverage" — use "use".' },
   { id: 'jargon-seamless',      regex: /\bseamless(ly)?\b/i,           severity: 'error', message: 'Buzzword "seamless" — name the concrete behavior.' },
-  { id: 'jargon-robust',        regex: /\brobust\b/i,                  severity: 'error', message: 'Buzzword "robust" — say what it actually does.' },
-  { id: 'jargon-delve',         regex: /\bdelve\b/i,                   severity: 'error', message: 'Buzzword "delve" — use "look at" or cut it.' },
+  { id: 'jargon-robust',        regex: /\brobust\b/i,                  severity: 'warning', message: 'Buzzword "robust" — often legitimate in technical prose; consider naming the specific behavior.' },
+  { id: 'jargon-delve',         regex: /\bdelve\b/i,                   severity: 'warning', message: 'Buzzword "delve" — consider "look at" or cutting it.' },
   { id: 'jargon-supercharge',   regex: /\bsupercharg(e|es|ed|ing)\b/i, severity: 'error', message: 'Buzzword "supercharge" — quantify the gain.' },
   { id: 'jargon-revolutionize', regex: /\brevolutioniz(e|es|ed|ing)\b|\brevolutionary\b/i, severity: 'error', message: 'Hype word "revolutionize/revolutionary".' },
   { id: 'jargon-game-changer',  regex: /\bgame[- ]chang(er|ing|ers)\b/i, severity: 'error', message: 'Cliché "game-changer" — state the specific change.' },
