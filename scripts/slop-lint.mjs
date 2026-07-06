@@ -30,6 +30,11 @@ function visibleText(line) {
   return decodeEntities(stripped).replace(/\s+/g, ' ').trim();
 }
 
+// NOTE: matching is line-scoped — each visible line is tested independently. Slop split
+// across two lines, or visible text sharing a line with a <script>/<style> open/close
+// tag, can be missed. Generated decks keep headlines and script/style on their own lines,
+// and the model's self-review gate (Layer 2) is the real structural defense; this linter
+// is a lexical backstop.
 // Extract [{ lineNo, text }] of visible content, skipping script/style/code blocks.
 export function extractLines(source, kind = 'html') {
   const lines = source.split(/\r?\n/);

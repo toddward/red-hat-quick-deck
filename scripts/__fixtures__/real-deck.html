@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Codex vs Claude Code - Red Hat Quick Deck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;900&family=Red+Hat+Text:wght@400;500;700&family=Red+Hat+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@rhds/tokens@3.0.2/css/global.min.css" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-primary: #000000;
+      --bg-secondary: #1f1f1f;
+      --bg-surface: #292929;
+      --text-primary: #ffffff;
+      --text-secondary: #c7c7c7;
+      --text-muted: #a3a3a3;
+      --accent: #ee0000;
+      --accent-dark: #a60000;
+      --accent-light: #f56e6e;
+      --tag-border: #383838;
+      --font-display: var(--rh-font-family-heading, "Red Hat Display", sans-serif);
+      --font-body: var(--rh-font-family-body-text, "Red Hat Text", sans-serif);
+      --font-mono: var(--rh-font-family-code, "Red Hat Mono", monospace);
+      --space-md: var(--rh-space-md, 16px);
+      --space-lg: var(--rh-space-lg, 24px);
+      --space-xl: var(--rh-space-xl, 32px);
+      --space-2xl: var(--rh-space-2xl, 48px);
+      --space-3xl: var(--rh-space-3xl, 64px);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .deck {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background: var(--bg-primary);
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      grid-template-rows: auto 1fr auto;
+      padding: clamp(28px, 5vw, 72px);
+      overflow: hidden;
+      background: linear-gradient(135deg, #000 0%, #111 58%, #1f1f1f 100%);
+    }
+
+    .slide.active {
+      display: grid;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      top: -22%;
+      right: -12%;
+      width: 66%;
+      height: 66%;
+      background: radial-gradient(ellipse, rgba(238, 0, 0, 0.13) 0%, rgba(238, 0, 0, 0.02) 42%, transparent 72%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .slide:nth-child(even)::before {
+      top: 42%;
+      left: -16%;
+      right: auto;
+      opacity: 0.9;
+    }
+
+    .slide > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar,
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-lg);
+      min-height: 36px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-secondary);
+      font-size: 0.82rem;
+      letter-spacing: 0;
+    }
+
+    .rh-logo {
+      display: block;
+      width: auto;
+      height: 22px;
+      flex: 0 0 auto;
+    }
+
+    .rh-logo.large {
+      height: 44px;
+    }
+
+    .closing-logo {
+      margin-top: var(--space-2xl);
+    }
+
+    .eyebrow,
+    .source,
+    .counter {
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    .source a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+    }
+
+    .content {
+      align-self: center;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      letter-spacing: 0;
+      line-height: 1.02;
+    }
+
+    h1 {
+      max-width: 940px;
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 900;
+    }
+
+    h2 {
+      max-width: 980px;
+      font-size: clamp(2.3rem, 5.5vw, 5.1rem);
+      font-weight: 900;
+    }
+
+    h3 {
+      font-size: clamp(1.25rem, 2vw, 1.75rem);
+      font-weight: 700;
+    }
+
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: clamp(1.05rem, 1.6vw, 1.35rem);
+      line-height: 1.5;
+      max-width: 820px;
+    }
+
+    .lead {
+      margin-top: var(--space-xl);
+      font-size: clamp(1.25rem, 2vw, 1.8rem);
+      color: var(--text-primary);
+      line-height: 1.32;
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      gap: var(--space-lg);
+    }
+
+    .two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .card {
+      border: 1px solid var(--tag-border);
+      border-radius: 6px;
+      background: rgba(41, 41, 41, 0.76);
+      padding: var(--space-xl);
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+      box-shadow: var(--rh-box-shadow-lg, 0 6px 8px 2px rgba(21, 21, 21, 0.3));
+    }
+
+    .card.strong {
+      border-color: rgba(238, 0, 0, 0.65);
+      background: linear-gradient(180deg, rgba(95, 0, 0, 0.34), rgba(41, 41, 41, 0.86));
+    }
+
+    .card p,
+    .callout p,
+    .matrix td {
+      font-size: clamp(0.95rem, 1.35vw, 1.15rem);
+    }
+
+    .tagrow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: var(--space-lg);
+    }
+
+    .tag {
+      border: 1px solid var(--tag-border);
+      border-radius: 999px;
+      padding: 7px 12px;
+      color: var(--text-secondary);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      white-space: nowrap;
+    }
+
+    .tag.hot {
+      border-color: var(--accent);
+      color: var(--accent-light);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: clamp(24px, 5vw, 72px);
+      align-items: center;
+    }
+
+    .big-number {
+      font-family: var(--font-display);
+      font-size: clamp(5rem, 15vw, 13rem);
+      font-weight: 900;
+      line-height: 0.85;
+      color: var(--accent);
+    }
+
+    .matrix {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(31, 31, 31, 0.78);
+      border: 1px solid var(--tag-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .matrix th,
+    .matrix td {
+      text-align: left;
+      vertical-align: top;
+      padding: 17px 18px;
+      border-bottom: 1px solid var(--tag-border);
+    }
+
+    .matrix th {
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-size: 1.08rem;
+      background: rgba(238, 0, 0, 0.18);
+    }
+
+    .matrix tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .matrix td:first-child {
+      width: 21%;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .callout {
+      border-left: 6px solid var(--accent);
+      padding: var(--space-xl);
+      background: rgba(31, 31, 31, 0.72);
+      max-width: 920px;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 14px;
+      align-items: stretch;
+      margin-top: var(--space-xl);
+    }
+
+    .step {
+      border: 1px solid var(--tag-border);
+      border-radius: 6px;
+      padding: 18px;
+      min-height: 136px;
+      background: rgba(41, 41, 41, 0.75);
+    }
+
+    .step b {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--accent-light);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+
+    .step span {
+      color: var(--text-secondary);
+      line-height: 1.36;
+    }
+
+    .notes {
+      position: fixed;
+      right: 24px;
+      bottom: 72px;
+      width: min(460px, calc(100vw - 48px));
+      max-height: 50vh;
+      overflow: auto;
+      display: none;
+      padding: 22px;
+      border: 1px solid var(--tag-border);
+      border-radius: 6px;
+      background: rgba(0, 0, 0, 0.92);
+      box-shadow: var(--rh-box-shadow-xl, 0 8px 24px 3px rgba(21, 21, 21, 0.35));
+      z-index: 10;
+    }
+
+    .notes.open {
+      display: block;
+    }
+
+    .notes h4 {
+      margin: 0 0 10px;
+      font-family: var(--font-display);
+    }
+
+    .notes p {
+      font-size: 0.95rem;
+    }
+
+    .progress {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 5px;
+      background: #292929;
+      z-index: 12;
+    }
+
+    .bar {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      transition: width 180ms ease;
+    }
+
+    .nav {
+      position: fixed;
+      right: 20px;
+      bottom: 18px;
+      display: flex;
+      gap: 8px;
+      z-index: 12;
+    }
+
+    .nav button {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--tag-border);
+      border-radius: 6px;
+      background: rgba(31, 31, 31, 0.92);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    @media (max-width: 820px) {
+      body {
+        overflow: auto;
+      }
+
+      .deck {
+        height: auto;
+        min-height: 100vh;
+      }
+
+      .slide {
+        position: relative;
+        min-height: 100vh;
+        padding: 26px;
+      }
+
+      .two,
+      .three,
+      .split,
+      .workflow {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 0;
+      }
+
+      .source {
+        display: none;
+      }
+    }
+
+    @media print {
+      body {
+        overflow: visible;
+        background: #000;
+      }
+
+      .deck {
+        height: auto;
+      }
+
+      .slide {
+        position: relative;
+        display: grid !important;
+        page-break-after: always;
+        height: 100vh;
+      }
+
+      .nav,
+      .notes,
+      .progress {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="deck" aria-live="polite">
+    <section class="slide active" data-notes="Codex and Claude Code are both agentic coding systems. This deck compares the practical product surfaces, operating model, autonomy controls, and fit rather than declaring a universal winner.">
+      <div class="topbar">
+        <div class="brand">
+          <svg class="rh-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+            <title>Red Hat</title>
+            <path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/>
+            <path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/>
+            <path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/>
+          </svg>
+          Quick deck
+        </div>
+        <div class="eyebrow">Codex vs Claude Code</div>
+      </div>
+      <div class="content">
+        <h1>Two agentic coding systems. <span class="accent">Different centers of gravity.</span></h1>
+        <p class="lead">Codex leans into ChatGPT-connected engineering teams, cloud worktrees, subagents, skills, and local CLI control. Claude Code leans into Anthropic's Claude ecosystem, terminal-native automation, memory, routines, and broad workflow surfaces.</p>
+        <div class="tagrow">
+          <span class="tag hot">current as of Apr 29, 2026</span>
+          <span class="tag">software engineering agents</span>
+          <span class="tag">team workflows</span>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Sources: OpenAI Codex; Anthropic Claude Code</div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="The most useful comparison is not 'which chatbot is smarter?' It is where each product wants the engineering workflow to happen and how it controls work.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">The shared baseline</div></div>
+      <div class="content">
+        <h2>They are not autocomplete tools anymore.</h2>
+        <div class="grid three" style="margin-top: var(--space-2xl);">
+          <div class="card">
+            <h3>Read the codebase</h3>
+            <p>Both products inspect project context, reason across files, and answer questions about unfamiliar systems.</p>
+          </div>
+          <div class="card">
+            <h3>Change real files</h3>
+            <p>Both can implement features, fix bugs, refactor code, and prepare reviewable changes.</p>
+          </div>
+          <div class="card">
+            <h3>Run feedback loops</h3>
+            <p>Both can run commands, tests, linters, and iterate when a task fails.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Sources: <a href="https://openai.com/codex/">openai.com/codex</a>; <a href="https://www.anthropic.com/product/claude-code">anthropic.com/product/claude-code</a></div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="Codex is positioned around OpenAI's agentic coding platform. The same agent shows up in the Codex app, CLI, IDE, web/cloud tasks, GitHub/Slack/Linear integrations, and ChatGPT account context.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Codex center</div></div>
+      <div class="content split">
+        <div>
+          <div class="big-number">01</div>
+          <h2>Codex is a command center for engineering agents.</h2>
+        </div>
+        <div class="callout">
+          <p>OpenAI presents Codex as a coding agent for building and shipping with AI, with app, editor, terminal, and cloud task surfaces connected by a ChatGPT account.</p>
+          <div class="tagrow">
+            <span class="tag hot">cloud worktrees</span>
+            <span class="tag">subagents</span>
+            <span class="tag">skills</span>
+            <span class="tag">automations</span>
+            <span class="tag">PR review</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Sources: <a href="https://openai.com/codex/">OpenAI Codex</a>; <a href="https://developers.openai.com/codex/cli">OpenAI Codex CLI</a></div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="Claude Code is positioned around a terminal-first agent that extends into Desktop, web, mobile, IDEs, Slack, CI/CD, routines, and browser workflows. Anthropic emphasizes Unix-style composition and persistent project instructions/memory.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Claude center</div></div>
+      <div class="content split">
+        <div>
+          <div class="big-number">02</div>
+          <h2>Claude Code is a terminal-native agent with wide workflow reach.</h2>
+        </div>
+        <div class="callout">
+          <p>Anthropic presents Claude Code as an agentic coding system that works at the project level, with CLI composition, CLAUDE.md guidance, memory, hooks, routines, and cross-surface handoff.</p>
+          <div class="tagrow">
+            <span class="tag hot">terminal first</span>
+            <span class="tag">CLAUDE.md</span>
+            <span class="tag">hooks</span>
+            <span class="tag">routines</span>
+            <span class="tag">remote control</span>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Sources: <a href="https://code.claude.com/docs/en/overview">Claude Code docs</a>; <a href="https://www.anthropic.com/product/claude-code">Anthropic product page</a></div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="This slide is the core decision matrix. It intentionally compares product behavior and operating model, not benchmark scores.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Core differences</div></div>
+      <div class="content">
+        <h2>The difference is where the agent is designed to live.</h2>
+        <table class="matrix" style="margin-top: var(--space-xl);">
+          <thead>
+            <tr>
+              <th>Dimension</th>
+              <th>Codex</th>
+              <th>Claude Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Primary product frame</td>
+              <td>OpenAI coding agent connected to ChatGPT, Codex app, CLI, IDE, cloud tasks, and team workflows.</td>
+              <td>Anthropic agentic coding system centered on Claude Code CLI and extended to desktop, web, mobile, IDE, Slack, CI/CD, and browser workflows.</td>
+            </tr>
+            <tr>
+              <td>Workflow bias</td>
+              <td>Parallel agent work, cloud environments, worktrees, skills, automations, review loops.</td>
+              <td>Terminal composition, shell pipelines, CLAUDE.md project memory, hooks, routines, and cross-device continuity.</td>
+            </tr>
+            <tr>
+              <td>Model family</td>
+              <td>OpenAI frontier coding models, with CLI model controls including GPT-5.x and Codex-specific options.</td>
+              <td>Claude models, with current docs pointing complex agentic coding toward Claude Opus 4.7 and speed/intelligence toward Sonnet 4.6.</td>
+            </tr>
+            <tr>
+              <td>Autonomy stance</td>
+              <td>Approval modes and sandboxing control whether Codex proposes, edits, or runs commands.</td>
+              <td>Permission model defaults cautious; built-in classifiers can distinguish safer actions from riskier ones.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="footer">
+        <div class="source">Sources: OpenAI Codex CLI docs; Claude Code docs; Claude model overview</div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="Codex has an explicit multi-agent story: app as command center, built-in worktrees and cloud environments, subagents in CLI/docs, and automations for recurring background work.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Codex strengths</div></div>
+      <div class="content">
+        <h2>Choose Codex when the job is turning a backlog into parallel engineering work.</h2>
+        <div class="workflow">
+          <div class="step"><b>01</b><span>Attach the repo and define the task.</span></div>
+          <div class="step"><b>02</b><span>Split work into cloud tasks, worktrees, or subagents.</span></div>
+          <div class="step"><b>03</b><span>Use skills and repo rules to match team standards.</span></div>
+          <div class="step"><b>04</b><span>Review diffs, tests, and PR feedback.</span></div>
+          <div class="step"><b>05</b><span>Automate repeated triage, review, and maintenance loops.</span></div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Source: <a href="https://openai.com/codex/">OpenAI Codex product page</a></div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="Claude Code's strongest differentiator is its composable CLI posture: it can be piped, scripted, scheduled, hooked, and carried across surfaces. This is attractive for developers who think in shell workflows.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Claude Code strengths</div></div>
+      <div class="content">
+        <h2>Choose Claude Code when the job should feel like part of the developer shell.</h2>
+        <div class="workflow">
+          <div class="step"><b>01</b><span>Start in the repo with Claude Code.</span></div>
+          <div class="step"><b>02</b><span>Guide behavior with CLAUDE.md, memory, and commands.</span></div>
+          <div class="step"><b>03</b><span>Pipe logs, diffs, and file lists into the agent.</span></div>
+          <div class="step"><b>04</b><span>Use hooks and routines for repeatable work.</span></div>
+          <div class="step"><b>05</b><span>Move sessions across terminal, desktop, web, mobile, Slack, and CI.</span></div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Source: <a href="https://code.claude.com/docs/en/overview">Claude Code overview</a></div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="This is a practical buying/usage rule. Most teams will evaluate both on their real repos, review quality, test-running reliability, tool permissions, and admin/governance fit.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Decision guide</div></div>
+      <div class="content">
+        <h2>Use the workflow fit as the first filter.</h2>
+        <div class="grid two" style="margin-top: var(--space-2xl);">
+          <div class="card strong">
+            <h3>Codex fits best when...</h3>
+            <p>You want a ChatGPT-connected engineering platform with cloud task execution, parallel agents, worktrees, skills, automations, and integrated PR review.</p>
+          </div>
+          <div class="card">
+            <h3>Claude Code fits best when...</h3>
+            <p>You want a terminal-forward agent that composes naturally with shell tools, persistent project instructions, hooks, routines, and handoff across many Claude surfaces.</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">Sources: official OpenAI and Anthropic docs, accessed Apr 29, 2026</div>
+        <div class="counter"></div>
+      </div>
+    </section>
+
+    <section class="slide" data-notes="The fairest next step is a repository-specific bakeoff: same issue, same tests, same review rubric, same autonomy limit. Measure accepted diffs, test pass rate, review burden, and security/admin fit.">
+      <div class="topbar"><div class="brand">Red Hat Quick Deck</div><div class="eyebrow">Bottom line</div></div>
+      <div class="content">
+        <h2>Bottom line: Codex is stronger as an agentic engineering platform; Claude Code is stronger as a deeply composable coding agent.</h2>
+        <p class="lead">For a team decision, run both against the same repo and score four things: accepted diff quality, test success, human review burden, and governance fit.</p>
+        <div class="tagrow">
+          <span class="tag hot">same prompt</span>
+          <span class="tag">same repo</span>
+          <span class="tag">same autonomy</span>
+          <span class="tag">same review rubric</span>
+        </div>
+        <div class="closing-logo">
+          <svg class="rh-logo large" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 613 145" role="img" aria-label="Red Hat">
+            <title>Red Hat</title>
+            <path d="M127.47,83.49c12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42l-7.45-32.36c-1.72-7.12-3.23-10.35-15.73-16.6C124.89,8.69,103.76.5,97.51.5,91.69.5,90,8,83.06,8c-6.68,0-11.64-5.6-17.89-5.6-6,0-9.91,4.09-12.93,12.5,0,0-8.41,23.72-9.49,27.16A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33C22.27,52,.5,55,.5,74.22c0,31.48,74.59,70.28,133.65,70.28,45.28,0,56.7-20.48,56.7-36.65,0-12.72-11-27.16-30.83-35.78" fill="#e00"/>
+            <path d="M160,72.07c1.73,8.19,1.73,9.05,1.73,10.13,0,14-15.74,21.77-36.43,21.77C78.54,104,37.58,76.6,37.58,58.49a18.45,18.45,0,0,1,1.51-7.33l3.66-9.06A6.43,6.43,0,0,0,42.53,44c0,9.22,36.3,39.45,84.94,39.45,12.51,0,30.61-2.58,30.61-17.46a14,14,0,0,0-.31-3.42Z"/>
+            <path d="M579.74,92.8c0,11.89,7.15,17.67,20.19,17.67a52.11,52.11,0,0,0,11.89-1.68V95a24.84,24.84,0,0,1-7.68,1.16c-5.37,0-7.36-1.68-7.36-6.73V68.3h15.56V54.1H596.78v-18l-17,3.68V54.1H568.49V68.3h11.25Zm-53,.32c0-3.68,3.69-5.47,9.26-5.47a43.12,43.12,0,0,1,10.1,1.26v7.15a21.51,21.51,0,0,1-10.63,2.63c-5.46,0-8.73-2.1-8.73-5.57m5.2,17.56c6,0,10.84-1.26,15.36-4.31v3.37h16.82V74.08c0-13.56-9.14-21-24.39-21-8.52,0-16.94,2-26,6.1l6.1,12.52c6.52-2.74,12-4.42,16.83-4.42,7,0,10.62,2.73,10.62,8.31v2.73a49.53,49.53,0,0,0-12.62-1.58c-14.31,0-22.93,6-22.93,16.73,0,9.78,7.78,17.24,20.19,17.24m-92.44-.94h18.09V80.92h30.29v28.82H506V36.12H487.93V64.41H457.64V36.12H439.55ZM370.62,81.87c0-8,6.31-14.1,14.62-14.1A17.22,17.22,0,0,1,397,72.09V91.54A16.36,16.36,0,0,1,385.24,96c-8.2,0-14.62-6.1-14.62-14.09m26.61,27.87h16.83V32.44l-17,3.68V57.05a28.3,28.3,0,0,0-14.2-3.68c-16.19,0-28.92,12.51-28.92,28.5a28.25,28.25,0,0,0,28.4,28.6,25.12,25.12,0,0,0,14.93-4.83ZM320,67c5.36,0,9.88,3.47,11.67,8.83H308.47C310.15,70.3,314.36,67,320,67M291.33,82c0,16.2,13.25,28.82,30.28,28.82,9.36,0,16.2-2.53,23.25-8.42l-11.26-10c-2.63,2.74-6.52,4.21-11.14,4.21a14.39,14.39,0,0,1-13.68-8.83h39.65V83.55c0-17.67-11.88-30.39-28.08-30.39a28.57,28.57,0,0,0-29,28.81M262,51.58c6,0,9.36,3.78,9.36,8.31S268,68.2,262,68.2H244.11V51.58Zm-36,58.16h18.09V82.92h13.77l13.89,26.82H292l-16.2-29.45a22.27,22.27,0,0,0,13.88-20.72c0-13.25-10.41-23.45-26-23.45H226Z" fill="#fff"/>
+          </svg>
+        </div>
+      </div>
+      <div class="footer">
+        <div class="source">
+          Sources:
+          <a href="https://openai.com/codex/">OpenAI Codex</a> |
+          <a href="https://developers.openai.com/codex/cli">Codex CLI</a> |
+          <a href="https://www.anthropic.com/product/claude-code">Claude Code</a> |
+          <a href="https://code.claude.com/docs/en/overview">Claude Code docs</a> |
+          <a href="https://platform.claude.com/docs/en/about-claude/models/overview">Claude models</a>
+        </div>
+        <div class="counter"></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="notes" id="notes" aria-label="Speaker notes">
+    <h4>Speaker notes</h4>
+    <p id="notesText"></p>
+  </aside>
+
+  <div class="progress" aria-hidden="true"><div class="bar" id="bar"></div></div>
+  <div class="nav" aria-label="Slide navigation">
+    <button id="prev" type="button" aria-label="Previous slide">&#8592;</button>
+    <button id="next" type="button" aria-label="Next slide">&#8594;</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const counters = Array.from(document.querySelectorAll(".counter"));
+    const notes = document.getElementById("notes");
+    const notesText = document.getElementById("notesText");
+    const bar = document.getElementById("bar");
+    let current = 0;
+
+    function showSlide(index) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, idx) => slide.classList.toggle("active", idx === current));
+      counters.forEach((counter) => {
+        counter.textContent = String(current + 1).padStart(2, "0") + " / " + String(slides.length).padStart(2, "0");
+      });
+      notesText.textContent = slides[current].dataset.notes || "";
+      bar.style.width = ((current + 1) / slides.length * 100) + "%";
+      history.replaceState(null, "", "#" + (current + 1));
+    }
+
+    function nextSlide() {
+      showSlide(current + 1);
+    }
+
+    function prevSlide() {
+      showSlide(current - 1);
+    }
+
+    document.getElementById("next").addEventListener("click", nextSlide);
+    document.getElementById("prev").addEventListener("click", prevSlide);
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("button, a, .notes")) return;
+      nextSlide();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) {
+        event.preventDefault();
+        nextSlide();
+      }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) {
+        event.preventDefault();
+        prevSlide();
+      }
+      if (event.key.toLowerCase() === "n") {
+        notes.classList.toggle("open");
+      }
+      if (event.key === "Home") showSlide(0);
+      if (event.key === "End") showSlide(slides.length - 1);
+    });
+
+    const initial = Number.parseInt(location.hash.replace("#", ""), 10);
+    showSlide(Number.isFinite(initial) ? initial - 1 : 0);
+  </script>
+</body>
+</html>

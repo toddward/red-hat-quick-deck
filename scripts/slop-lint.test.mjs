@@ -25,8 +25,8 @@ test('clean fixture: zero findings', () => {
   assert.equal(findings.length, 0, JSON.stringify(findings, null, 2));
 });
 
-test('real deck codex-vs-claude: zero ERROR findings (false-positive guard)', () => {
-  const errors = lint(read('..', 'codex-vs-claude-quick-deck.html'), { kind: 'html' })
+test('real deck fixture: zero ERROR findings (false-positive guard)', () => {
+  const errors = lint(read('__fixtures__', 'real-deck.html'), { kind: 'html' })
     .filter((f) => f.severity === 'error');
   assert.equal(errors.length, 0, JSON.stringify(errors, null, 2));
 });
@@ -37,4 +37,38 @@ test('curly (smart) apostrophes are caught - regression for apostrophe classes',
   const ids = new Set(lint(src, { kind: 'html' }).map((f) => f.ruleId));
   assert.ok(ids.has('throat-clearing'), `curly "Here${a}s why" should be caught`);
   assert.ok(ids.has('binary-contrast-not-just'), `curly "isn${a}t just" should be caught`);
+});
+
+test('markdown code fences are skipped in md mode', () => {
+  const md = [
+    '# Real headline that reads clean',
+    '',
+    '```js',
+    'const x = "leverage seamless game-changer"; // slop inside code must be ignored',
+    '```',
+    '',
+    'A plain sentence about air-gapped inference.',
+  ].join('\n');
+  const findings = lint(md, { kind: 'md' });
+  assert.equal(findings.length, 0, JSON.stringify(findings, null, 2));
+});
+
+test('script and style blocks are skipped (no false positives from CSS/JS)', () => {
+  const html = [
+    '<style>',
+    '  /* leverage seamless robust game-changer */',
+    '</style>',
+    '<script>',
+    "  // here's why we delve into synergy",
+    '</script>',
+    '<h1>Air-gapped inference on your own hardware</h1>',
+  ].join('\n');
+  const findings = lint(html, { kind: 'html' });
+  assert.equal(findings.length, 0, JSON.stringify(findings, null, 2));
+});
+
+test('HTML entity em-dashes are decoded and flagged', () => {
+  const ids = lint('<p>Air-gapped &mdash; on-prem &#8212; yours</p>', { kind: 'html' })
+    .map((f) => f.ruleId);
+  assert.ok(ids.includes('em-dash'), 'entity-encoded em-dash should be caught');
 });
