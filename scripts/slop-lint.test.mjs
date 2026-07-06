@@ -30,3 +30,11 @@ test('real deck codex-vs-claude: zero ERROR findings (false-positive guard)', ()
     .filter((f) => f.severity === 'error');
   assert.equal(errors.length, 0, JSON.stringify(errors, null, 2));
 });
+
+test('curly (smart) apostrophes are caught - regression for apostrophe classes', () => {
+  const a = String.fromCharCode(0x2019); // curly apostrophe, built at runtime so the source stays ASCII-safe
+  const src = `<h1>Here${a}s why we leverage it</h1><p>It isn${a}t just hype</p>`;
+  const ids = new Set(lint(src, { kind: 'html' }).map((f) => f.ruleId));
+  assert.ok(ids.has('throat-clearing'), `curly "Here${a}s why" should be caught`);
+  assert.ok(ids.has('binary-contrast-not-just'), `curly "isn${a}t just" should be caught`);
+});

@@ -24,17 +24,17 @@ export const patterns = [
   { id: 'jargon-corporate',     regex: /\bparadigm\b|\bsynerg(y|ies|istic)\b|\bturnkey\b|\bfrictionless\b/i, severity: 'error', message: 'Corporate buzzword — use plain language.' },
 
   // Filler / throat-clearing openers.
-  { id: 'filler-today',   regex: /\bin today['']?s\b|\bever[- ]evolving\b|\bfast[- ]paced\b|\bin a world where\b/i, severity: 'error', message: 'Filler opener — start with the point.' },
-  { id: 'filler-phrase',  regex: /\bat the end of the day\b|\bwhen it comes to\b|\bthe reality is\b|\bit['']s worth noting\b|\bneedless to say\b/i, severity: 'error', message: 'Filler phrase — delete and state the content.' },
-  { id: 'throat-clearing', regex: /\bhere['']s (what|why|the thing|this|that)\b|\bthe uncomfortable truth\b|\blet me be clear\b|\bmake no mistake\b|\blet that sink in\b/i, severity: 'error', message: 'Throat-clearing — cut it and make the point.' },
+  { id: 'filler-today',   regex: /\bin today['\u2019]?s\b|\bever[- ]evolving\b|\bfast[- ]paced\b|\bin a world where\b/i, severity: 'error', message: 'Filler opener — start with the point.' },
+  { id: 'filler-phrase',  regex: /\bat the end of the day\b|\bwhen it comes to\b|\bthe reality is\b|\bit['\u2019]s worth noting\b|\bneedless to say\b/i, severity: 'error', message: 'Filler phrase — delete and state the content.' },
+  { id: 'throat-clearing', regex: /\bhere['\u2019]s (what|why|the thing|this|that)\b|\bthe uncomfortable truth\b|\blet me be clear\b|\bmake no mistake\b|\blet that sink in\b/i, severity: 'error', message: 'Throat-clearing — cut it and make the point.' },
 
   // Binary-contrast structures ("not X, it's Y").
-  { id: 'binary-contrast-not-just',    regex: /\b(not|isn['']t|it['']s not)\s+just\b/i,       severity: 'error', message: 'Binary-contrast cliché "not just…" — state the point directly.' },
-  { id: 'binary-contrast-its-not',     regex: /\bit['']s not\b[^.?!]*\bit['']s\b/i,            severity: 'error', message: '"It\'s not X, it\'s Y" reversal — say Y directly.' },
+  { id: 'binary-contrast-not-just',    regex: /\b(not|isn['\u2019]t|it['\u2019]s not)\s+just\b/i,       severity: 'error', message: 'Binary-contrast cliché "not just…" — state the point directly.' },
+  { id: 'binary-contrast-its-not',     regex: /\bit['\u2019]s not\b[^.?!]*\bit['\u2019]s\b/i,            severity: 'error', message: '"It\'s not X, it\'s Y" reversal — say Y directly.' },
   { id: 'binary-contrast-not-because', regex: /\bnot because\b[^.?!]*\bbut because\b/i,         severity: 'error', message: '"Not because X, but because Y" — state Y.' },
 
   // Meta-commentary.
-  { id: 'meta-commentary', regex: /\bplot twist\b|\bspoiler\b|\blet me walk you through\b|\bin this section\b|\bas we['']ll see\b/i, severity: 'error', message: 'Meta-commentary — let the deck move, do not narrate it.' },
+  { id: 'meta-commentary', regex: /\bplot twist\b|\bspoiler\b|\blet me walk you through\b|\bin this section\b|\bas we['\u2019]ll see\b/i, severity: 'error', message: 'Meta-commentary — let the deck move, do not narrate it.' },
 
   // Lower-signal / context-dependent — report only, never fail the run.
   { id: 'staccato-tricolon', regex: /\b[A-Z][a-z]+\.\s+[A-Z][a-z]+\.\s+[A-Z][a-z]+\./, severity: 'warning', message: 'Possible staccato tricolon ("Faster. Smarter. Better.") — allowed once for a title/close, not as filler.' },
