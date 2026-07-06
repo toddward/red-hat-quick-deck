@@ -28,6 +28,8 @@ An [Agent Skill](https://platform.claude.com/docs/en/agents-and-tools/agent-skil
 | `red-hat-quick-deck.skill` | Packaged skill archive for distribution |
 | `redhat-brand.md` | Red Hat brand reference — full color palette, typography rules, and design principles |
 | `story-arcs.md` | Narrative structure guide — Problem/Tension/Resolution, Myth-Busting, and Journey arcs |
+| `references/anti-ai-slop.md` | Voice rules + scoring rubric that keep generated copy from reading as AI-written (adapted from stop-slop) |
+| `scripts/slop-lint.mjs` | Deterministic linter that flags lexical slop tells in a generated deck |
 
 ## Usage
 
@@ -74,6 +76,21 @@ Every generated deck is also saved as a `.md` outline next to the `.html`, using
 ### What's not (yet) exported
 
 No PPTX export. PowerPoint would require a runtime dependency; the PDF + Markdown combo covers the common "leave-behind" use cases without adding weight to the skill.
+
+## Voice & Anti-Slop
+
+Generated decks are held to an enforced voice standard so they read like a credible
+engineer wrote them, not a landing page. The skill applies `references/anti-ai-slop.md`
+while writing, runs a non-negotiable self-review gate (banned phrases/structures + a
+5-dimension score) before delivery, and backstops it with `scripts/slop-lint.mjs`, a
+zero-dependency linter you can also run yourself:
+
+```bash
+node scripts/slop-lint.mjs your-deck.html your-deck.md
+```
+
+The voice catalog is adapted for slides from [stop-slop](https://github.com/hardikpandya/stop-slop)
+by Hardik Pandya (MIT).
 
 ## License
 
