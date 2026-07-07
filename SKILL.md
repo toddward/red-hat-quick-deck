@@ -836,19 +836,24 @@ Search for current statistics, quotes, and developments related to the topic. Lo
 - Adoption metrics or trends
 
 ### Step 2: Choose a Story Arc
-Read `references/story-arcs.md` and select the best arc for the content:
+The arc is a spine, not a fill-in-the-blank template — vary structure so decks don't
+feel formulaic. Read `references/story-arcs.md` and select the best arc for the content:
 - **Problem → Tension → Resolution**: Best for introducing a new tool, approach, or technology
 - **Myth-Busting**: Best for challenging conventional thinking
 - **Journey**: Best for case studies or retrospectives
 
 ### Step 3: Outline the Deck
 Write the slide headlines FIRST. The headlines alone should tell the complete story. Show the user
-the outline before generating the full HTML if the topic is complex.
+the outline before generating the full HTML if the topic is complex. Run each headline through the
+anti-slop checks in `references/anti-ai-slop.md` before proceeding — assertions, active voice,
+concrete, no hype, no em-dashes.
 
 ### Step 4: Write Each Slide
 For each slide:
 - Write the headline as an assertion
 - Write concise supporting content (fewer words = more impact)
+- Apply `references/anti-ai-slop.md` as you write — no buzzwords, no binary-contrast
+  clichés, no padded triads, no em-dashes; name the specific thing
 - Choose the appropriate slide type
 - Add source attributions where data is cited
 - Add contextual notes with references, links, deeper explanations, and related resources that let viewers dive deeper into the slide's topic
@@ -890,6 +895,29 @@ When writing prompts, specify:
 - Red Hat color palette (reds, dark grays, subtle teals/purples)
 - No text in the image (text will be overlaid in HTML)
 - Aspect ratio suited for the slide layout (usually 16:9 or specific region)
+
+## Anti-AI-Slop (Non-Negotiable)
+
+Decks must not read as AI-written. The failure mode is not just buzzwords — it is
+rhetorical sameness: padded triads, binary-contrast clichés ("not just X, it's Y"),
+throat-clearing, hype adjectives, and metronomic rhythm. The full catalog, the voice
+target, and the scoring rubric live in `references/anti-ai-slop.md`. Read it before
+writing copy.
+
+**Mandatory pre-delivery gate.** Before you emit the final HTML, run this gate and do
+not skip it:
+
+1. **Quick Checks** — pass every headline, eyebrow/tag, bullet, stat caption, and
+   contextual-notes paragraph against the banned phrases and structures in
+   `references/anti-ai-slop.md`. Rewrite every hit.
+2. **Score** — rate the deck copy on the five rubric dimensions (Directness, Rhythm,
+   Trust, Authenticity, Density). If the total is **below 35/50, revise and re-score.**
+3. **Lint** — run the deterministic backstop on the generated files:
+   `node scripts/slop-lint.mjs <deck>.html <deck>.md`
+   Fix every `[error]`. Review each `[warning]` and fix unless it is a deliberate,
+   defensible choice (e.g. one intentional tricolon on the closing slide).
+4. **Only then deliver.** The linter catches lexical tells; the structural/rhetorical
+   slop is yours to catch in steps 1–2. A clean linter run is necessary, not sufficient.
 
 ## Navigation JavaScript
 

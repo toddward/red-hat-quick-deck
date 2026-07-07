@@ -62,6 +62,9 @@ Good for case studies, project retrospectives, or transformation stories.
 
 ## Slide Design Principles for Storytelling
 
+Voice matters as much as structure. Apply `references/anti-ai-slop.md` to every line —
+the arc gives the deck its shape, the voice rules keep it from sounding machine-written.
+
 ### One idea per slide
 Every slide should be reducible to a single sentence. If you need two ideas, make two slides.
 
@@ -80,8 +83,12 @@ Don't dump everything at once. Each slide should reveal the next piece of the pu
 ### Emotional rhythm
 Alternate between tension and relief. After a slide about a hard problem, show a slide about the elegant solution. After dense technical content, give a breathing slide with a big quote or visual.
 
-### The Rule of Three
-Group supporting points in threes. Three benefits. Three use cases. Three proof points. The human brain finds triads satisfying and memorable.
+### Vary Your Groupings (the Rule of Three, reframed)
+Three is one option, not the default. Use the count the content genuinely supports —
+two or four is equally fine. **Never pad to a count for rhythm** (a manufactured weak
+third is the most common AI tell in decks). **Never use the staccato tricolon**
+("Faster. Smarter. Better."). A deliberate tricolon is fine used **once**, for a title
+or the closing line — never as a per-slide habit. See `references/anti-ai-slop.md`.
 
 ## Technical Presentation Specifics
 
